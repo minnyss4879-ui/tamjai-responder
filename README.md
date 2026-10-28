@@ -1,2 +1,16 @@
-# tamjai-responder-demo
-TamJai Responder (譚仔回響) — UI/UX prototype, static demo
+# TamJai Responder 譚仔回響 — UI/UX 原型演示
+
+**線上預覽：https://minnyss4879-ui.github.io/tamjai-responder/**
+
+純前端原型：單一 HTML 檔、內嵌模擬資料、不連資料庫、無需登入，任何人可直接打開。
+
+## 十個頁面
+儀表板 · 收件匣 · AI 草稿審批 · 真假信號 · 熱點地圖 · 辣度雷達 · 每日簡報 · 上載 · 審計日誌 · 設定
+
+## 重點功能
+- **辣度雷達**：辣度 = 嚴重度 × 主題緊迫性 × 證據強度，Listening → Strategy → Replying
+- **真假信號**：五項信號、三種狀態（真實 / 可疑 / 排除）、一句話解釋
+- **AI 草稿審批**：僅兩種語氣（真誠道歉 / 專業回應）× 四語言語體 × 兩種長度，可無限次重新生成並保留版本歷史，多語 Guardrail、人工批准門
+- **熱點地圖**：港島／九龍／新界 × 時段，僅 OpenRice／Foodpanda／Keeta
+
+> 本倉庫僅作演示用途，所有資料為模擬資料。
