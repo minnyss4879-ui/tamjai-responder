@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-page-node-id="bMjfsGD0zN4s90Vtyz0Ykf">
+<head data-page-node-id="5eUEYaiVVpl74zb2bbY1kX">
+<meta charset="UTF-8" data-page-node-id="LHEEUDTa4jIKCRWvBkk7sK" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="OUM1ZCkpGyayfe9aGGEgRP" />
+<title>TamJai Responder 譚仔回響 · UI/UX 原型演示</title>
+<style>
+:root{
+  --red:#C8102E; --red-deep:#A50D26; --yellow:#FFC72C; --ink:#1C1B1A; --muted:#8A8782;
+  --bg:#F6F5F2; --card:#FFFFFF; --line:#E8E5DF; --ok:#1F8A4C; --warn:#B96A00; --bad:#C8102E;
+  --radius:14px; --shadow:0 1px 2px rgba(28,27,26,.05),0 4px 16px rgba(28,27,26,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
+button{font:inherit;cursor:pointer;border:none;background:none}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#D8D4CC;border-radius:8px}
+
+/* ---------- 布局 ---------- */
+#shell{display:flex;height:100vh;overflow:hidden}
+#side{width:224px;flex:0 0 224px;background:var(--card);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;padding:16px 12px}
+#main{flex:1;overflow-y:auto;padding:24px 28px 60px;scroll-behavior:smooth}
+.logo{display:flex;align-items:center;gap:10px;padding:4px 8px 14px}
+.logo .bowl{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--red),var(--red-deep));
+  display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:var(--shadow)}
+.logo h1{font-size:16px;letter-spacing:.5px}
+.logo small{display:block;font-size:10.5px;color:var(--muted);font-weight:400;letter-spacing:1px}
+nav{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+nav .grp{font-size:10.5px;color:var(--muted);letter-spacing:2px;padding:14px 10px 6px}
+nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;color:var(--ink);
+  text-decoration:none;font-weight:500;transition:.15s}
+nav a .ic{width:20px;text-align:center;font-size:15px}
+nav a:hover{background:#F3F0EA}
+nav a.on{background:var(--red);color:#fff}
+nav a.on .cnt{background:#fff;color:var(--red)}
+nav .cnt{margin-left:auto;background:#F0E9E0;color:var(--muted);font-size:11px;padding:1px 8px;border-radius:99px;font-weight:600}
+.side-foot{margin-top:auto;padding:10px;font-size:11px;color:var(--muted);border-top:1px dashed var(--line)}
+.side-foot b{color:var(--ink)}
+
+/* ---------- 頂欄 ---------- */
+#topbar{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+#topbar h2{font-size:21px}
+#topbar .sub{color:var(--muted);font-size:12.5px}
+.spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);
+  border-radius:99px;padding:6px 14px;font-weight:500}
+.pill .dot{width:8px;height:8px;border-radius:50%}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--yellow);display:flex;align-items:center;
+  justify-content:center;font-weight:700;color:var(--ink);font-size:13px}
+.banner{background:#FFF7E0;border:1px solid #F2E3B3;color:#7A5B00;border-radius:10px;
+  padding:9px 14px;font-size:12.5px;display:flex;gap:8px;align-items:center;margin-bottom:18px}
+
+/* ---------- 通用組件 ---------- */
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card .hd{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;font-weight:600}
+.card .hd small{color:var(--muted);font-weight:400}
+.card .bd{padding:16px 18px}
+.kpi{padding:16px 18px;position:relative}
+.kpi .lab{color:var(--muted);font-size:12.5px}
+.kpi .num{font-size:28px;font-weight:700;margin:2px 0}
+.kpi .trend{font-size:12px;font-weight:600}
+.kpi .em{position:absolute;right:14px;top:14px;font-size:22px;opacity:.85}
+.up{color:var(--ok)} .down{color:var(--bad)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;
+  padding:2px 9px;border-radius:99px;background:#F0EDE6;color:#5C5952}
+.chip.red{background:#FBE9EC;color:var(--red)} .chip.green{background:#E5F4EB;color:var(--ok)}
+.chip.amber{background:#FFF3DC;color:var(--warn)} .chip.gray{background:#EEECE7;color:var(--muted)}
+.chip.blue{background:#E8F0FB;color:#2B6CB0}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:9px;padding:8px 16px;font-weight:600;transition:.15s;border:1px solid transparent}
+.btn.primary{background:var(--red);color:#fff} .btn.primary:hover{background:var(--red-deep)}
+.btn.ghost{border-color:var(--line);background:var(--card);color:var(--ink)} .btn.ghost:hover{background:#F3F0EA}
+.btn.subtle{color:var(--muted)} .btn.subtle:hover{color:var(--ink)}
+.btn.sm{padding:5px 12px;font-size:12.5px;border-radius:8px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.tag{font-size:10.5px;padding:1px 7px;border-radius:5px;font-weight:700;letter-spacing:.5px}
+.tag.ai{background:linear-gradient(90deg,#EDE4FF,#FDE7F1);color:#7A3FBF}
+.rowline{display:flex;align-items:center;gap:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11.5px;color:var(--muted);text-align:left;font-weight:600;padding:8px 12px;border-bottom:1px solid var(--line);letter-spacing:.5px}
+td{padding:10px 12px;border-bottom:1px solid #F1EEE8;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tbody tr.click{cursor:pointer} tbody tr.click:hover{background:#FAF8F4}
+.seg{display:inline-flex;background:#F0EDE6;border-radius:9px;padding:3px;gap:2px}
+.seg button{padding:5px 14px;border-radius:7px;font-weight:600;font-size:12.5px;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+input[type=text],select,textarea{font:inherit;border:1px solid var(--line);border-radius:9px;padding:8px 12px;background:#fff;color:var(--ink);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--red)}
+.empty{color:var(--muted);text-align:center;padding:30px;font-size:13px}
+
+/* ---------- 抽屜 ---------- */
+#drawer{position:fixed;top:0;right:-560px;width:560px;max-width:94vw;height:100vh;background:var(--card);
+  box-shadow:-12px 0 40px rgba(28,27,26,.18);transition:right .28s cubic-bezier(.2,.8,.2,1);z-index:50;
+  display:flex;flex-direction:column}
+#drawer.open{right:0}
+#drawer .dh{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+#drawer .db{flex:1;overflow-y:auto;padding:20px 22px}
+#mask{position:fixed;inset:0;background:rgba(28,27,26,.35);opacity:0;pointer-events:none;transition:.25s;z-index:40}
+#mask.on{opacity:1;pointer-events:auto}
+
+/* ---------- Toast ---------- */
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(80px);background:var(--ink);
+  color:#fff;padding:11px 20px;border-radius:12px;font-weight:500;transition:.3s;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.25);max-width:80vw}
+#toast.on{transform:translateX(-50%) translateY(0)}
+
+/* ---------- Dashboard 圖形 ---------- */
+.donut-wrap{display:flex;align-items:center;gap:22px}
+.legend{display:flex;flex-direction:column;gap:8px;font-size:12.5px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:7px}
+.spark{width:100%;height:56px}
+.wtopic{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.wtopic .bar{flex:1;height:9px;border-radius:9px;background:#F0EDE6;overflow:hidden}
+.wtopic .bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--red),#E8552F)}
+
+/* ---------- 熱點圖 ---------- */
+.hm{display:grid;grid-template-columns:110px repeat(6,1fr);gap:5px;font-size:12px}
+.hm .h{color:var(--muted);font-weight:600;padding:4px 6px;font-size:11.5px}
+.hm .rl{font-weight:600;padding:4px 6px;white-space:nowrap}
+.hm .c{border-radius:7px;aspect-ratio:2.1;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:default}
+
+/* ---------- 草稿 ---------- */
+.tonebar{display:flex;gap:8px;margin:6px 0 14px}
+.tonebar button{border:1.5px solid var(--line);border-radius:10px;padding:8px 14px;font-weight:600;font-size:13px;background:#fff}
+.tonebar button.on{border-color:var(--red);color:var(--red);background:#FDF1F3}
+.draft-body{background:#FAF8F4;border:1px dashed #D8D2C6;border-radius:10px;padding:14px 16px;font-size:13.5px;white-space:pre-wrap}
+.guard{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.gitem{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;padding:8px 12px;border-radius:9px}
+.gitem.block{background:#FBE9EC;color:#8E0B22}
+.gitem.check{background:#FFF3DC;color:#7A5B00}
+.gitem.hint{background:#EEF3F9;color:#33557E}
+.gitem .st{font-weight:700;flex:0 0 auto}
+.steps{display:flex;gap:0;align-items:center;margin:14px 0 4px;font-size:11px;color:var(--muted)}
+.steps .s{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.steps .s i{width:22px;height:22px;border-radius:50%;background:#EFECE5;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;font-weight:700;color:var(--muted)}
+.steps .s.done i{background:var(--ok);color:#fff}
+.steps .s.cur i{background:var(--red);color:#fff}
+.steps .ln{height:2px;flex:1;background:#EFECE5;margin-top:-22px}
+.steps .ln.done{background:var(--ok)}
+.approved-strip{background:#E5F4EB;border:1px solid #C4E5D0;color:var(--ok);border-radius:10px;padding:10px 14px;font-weight:600;font-size:13px}
+/* ---------- 草稿語言 / 風格切換 ---------- */
+.dw-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#F7F5F0;border:1px solid var(--line);border-radius:11px;padding:9px 12px;margin-bottom:14px}
+.dw-bar .grp{display:flex;align-items:center;gap:7px}
+.dw-bar .k{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.dw-bar .seg{padding:2px}
+.dw-bar .seg button{padding:5px 11px;font-size:12px}
+.dw-bar .seg button.on{color:var(--red)}
+.dw-chip{font-size:11.5px;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.dw-refs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:9px}
+.dw-refs a{color:#2B6CB0;text-decoration:none;font-size:12px}
+.dw-long{font-size:11.5px;color:var(--muted);margin-top:6px}
+.dw-long b{color:var(--ink)}
+.dw-fail{background:#FBE9EC;border:1px dashed #EFC9D1;border-radius:10px;padding:16px;color:#8E0B22;font-size:13px}
+.gitem .fix{display:block;margin-top:4px;font-size:11.8px;color:inherit;opacity:.9}
+.gitem .rid{font-family:var(--mono);font-size:10.5px;background:rgba(0,0,0,.06);border-radius:5px;padding:1px 5px;margin-right:5px}
+.gitem .sev{font-size:10.5px;font-weight:700;border-radius:5px;padding:1px 5px;background:rgba(0,0,0,.06);margin-right:5px}
+.dw-ack{display:flex;gap:8px;align-items:flex-start;background:#FFF3DC;border:1px solid #F0DDB4;border-radius:9px;padding:9px 12px;font-size:12.5px;color:#7A5B00;margin-top:10px}
+.dw-edit{background:#F7F5F0;border:1px solid var(--line);border-radius:11px;padding:12px;margin-top:14px}
+.dw-edit textarea{width:100%;font-size:13px;line-height:1.65}
+.dw-edit input{width:100%;margin-top:8px}
+.dw-edit .row{display:flex;gap:8px;margin-top:9px;align-items:center}
+.dw-note{font-size:11.5px;color:var(--warn);background:#FFF9EC;border:1px dashed #EFD9A8;border-radius:8px;padding:7px 10px;margin-top:10px}
+/* ---------- 草稿版本 / 重新生成 ---------- */
+.dw-bar .btn.regen{background:#FDF1F3;border-color:#F3C6CE;color:var(--red);font-weight:700}
+.dw-bar .btn.regen:hover{background:#FBE4E8}
+.dw-chip.tone{background:#FDF1F3;border-color:#F3C6CE;color:var(--red)}
+.dw-hist{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:10px}
+.dw-hist .k{font-weight:700;color:var(--muted);letter-spacing:.02em}
+.dw-hist .hint{font-size:11px;color:#9A958B}
+.vchip{border:1px solid var(--line);background:#fff;border-radius:8px;padding:2px 9px;font-size:11.5px;font-weight:700;color:var(--ink);cursor:pointer;font-family:var(--mono)}
+.vchip.on{border-color:var(--red);color:var(--red);background:#FDF1F3}
+.vchip.old{color:var(--muted);border-style:dashed}
+.dw-preview{margin-top:9px;background:#EEF3F9;border:1px dashed #BFD2E8;border-radius:9px;padding:8px 12px;font-size:12px;color:#33557E;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.tone-filter{display:flex;gap:6px;padding:2px 4px 9px;flex-wrap:wrap}
+.tone-filter button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.tone-filter button.on{border-color:var(--red);background:#FDF1F3;color:var(--red)}
+
+/* ---------- 信號 ---------- */
+.gauge{position:relative;width:150px;margin:0 auto}
+.gauge .val{position:absolute;top:44px;left:0;right:0;text-align:center;font-size:30px;font-weight:800}
+.gauge .cap{position:absolute;top:80px;left:0;right:0;text-align:center;font-size:11.5px;color:var(--muted)}
+.sig{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.sig:last-child{border-bottom:none}
+.sig .ic{flex:0 0 auto;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff}
+.sig .ic.g{background:var(--ok)} .sig .ic.r{background:var(--bad)} .sig .ic.y{background:var(--warn)}
+.sig small{display:block;color:var(--muted);font-size:11.5px}
+
+/* ---------- 雷達 ---------- */
+.radar-legend{display:flex;gap:16px;font-size:12.5px;justify-content:center;margin-top:8px}
+.radar-legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:6px}
+
+/* ---------- 辣度個案 / 策略卡 ---------- */
+.spice{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;letter-spacing:.3px}
+.spice.l4{background:#8E0B22;color:#fff}
+.spice.l3{background:#C8102E;color:#fff}
+.spice.l2{background:#FFF3DC;color:#B96A00;border:1px solid #F0DDB4}
+.spice.l1{background:#F0EDE6;color:#5C5952}
+.sx{border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow)}
+.sx.seen{opacity:.66}
+.sx-hd{padding:11px 14px;display:flex;align-items:center;align-content:center;gap:8px;flex-wrap:wrap;background:#FDFBF7;border-bottom:1px dashed var(--line)}
+.sx-bd{padding:12px 14px;display:flex;flex-direction:column;gap:9px;font-size:12.8px}
+.sx-row{display:flex;gap:10px;align-items:flex-start}
+.sx-k{flex:0 0 96px;font-size:11.5px;font-weight:700;color:var(--muted);padding-top:2px;letter-spacing:.3px}
+.sx-ft{padding:10px 14px;border-top:1px solid var(--line);background:#FCFAF6;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.plbar{display:inline-flex;height:9px;width:88px;border-radius:5px;overflow:hidden;background:#F0EDE6;vertical-align:middle}
+.plbar i{display:block;height:100%}
+.strat{background:#FAF8F4;border:1px dashed #DCD6CA;border-radius:10px;padding:10px 12px;font-size:12.5px;display:flex;flex-direction:column;gap:5px;width:100%}
+.strat b{font-weight:700}
+.strat .k{color:var(--muted);font-weight:600;margin-right:6px}
+.sx-sec{font-size:12px;font-weight:800;letter-spacing:1px;color:var(--muted);margin:16px 0 8px}
+.spice-stat{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.spice-stat .item{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:9px;background:#FAF8F4;font-size:12px;border:1px solid var(--line)}
+.spice-stat .item b{font-size:15px}
+
+/* ---------- 審計 ---------- */
+.risk{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.risk.r1{background:#FBE9EC;color:var(--red)} .risk.r2{background:#FFF3DC;color:var(--warn)}
+.risk.r3{background:#EEECE7;color:var(--muted)}
+.tl{position:relative;padding-left:24px}
+.tl::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:#EDE9E1}
+.tl .ev{position:relative;padding:8px 0 14px}
+.tl .ev::before{content:"";position:absolute;left:-21px;top:13px;width:10px;height:10px;border-radius:50%;
+  background:var(--card);border:3px solid var(--red)}
+.tl .ev.mut::before{border-color:#D9D4CB}
+.tl .t{font-size:11.5px;color:var(--muted)}
+
+/* ---------- 設定 ---------- */
+.src{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px dashed var(--line)}
+.src:last-child{border-bottom:none}
+.src .ic{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff}
+.switch{margin-left:auto;width:40px;height:23px;border-radius:99px;background:#DDD9D0;position:relative;transition:.2s}
+.switch.on{background:var(--ok)}
+.switch::after{content:"";position:absolute;top:2.5px;left:2.5px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.switch.on::after{left:19.5px}
+.switch.off-locked{opacity:.6}
+
+/* ---------- 真假分析 ---------- */
+.auth{border:1px solid var(--line);border-radius:11px;background:#FDFBF7;padding:12px 14px}
+.auth-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;font-weight:700}
+.auth-line{font-size:12.5px;background:#fff;border:1px dashed #DCD6CA;border-radius:9px;padding:9px 12px;margin:9px 0;line-height:1.6}
+.atbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.atbl th{font-size:11px;padding:6px 8px;border-bottom:1px solid var(--line)}
+.atbl td{padding:7px 8px;border-bottom:1px dashed var(--line);vertical-align:middle}
+.atbl tr:last-child td{border-bottom:none}
+.chip.xline{text-decoration:line-through;opacity:.8}
+.hintbox{font-size:11.5px;color:var(--muted);background:#FAF8F4;border-radius:8px;padding:8px 10px;margin-top:8px;line-height:1.55}
+.sample{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line);font-size:12px}
+.sample:last-child{border-bottom:none}
+.mono{font-variant-numeric:tabular-nums}
+
+/* ---------- 原因輸入彈窗 ---------- */
+#modal{position:fixed;inset:0;background:rgba(28,27,26,.42);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}
+#modal.on{display:flex}
+.mbox{background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.28);width:500px;max-width:96vw;padding:20px 22px}
+.mbox b.mt{font-size:15px}
+.mbox .mdesc{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.6}
+.mbox textarea{width:100%;margin-top:10px}
+#mo-choices{display:none;gap:8px;margin-top:10px;flex-wrap:wrap}
+.on-sel{border-color:var(--red)!important;color:var(--red);background:#FDF1F3}
+
+@media(max-width:900px){#side{display:none}#drawer{width:100vw;max-width:100vw}}
+</style>
+</head>
+<body data-page-node-id="oMlpL2yTDd5uRUYQqDzehi">
+<div id="shell" data-page-node-id="VnrnJa1tyVzMWeVV6G7afX">
+  <!-- ================= 側欄 ================= -->
+  <aside id="side" data-page-node-id="mTaSmLGYeXDv96CQAZMJtl">
+    <div class="logo" data-page-node-id="emmMHjffcBGzQ6N0CVN86B">
+      <div class="bowl" data-page-node-id="7SgSWTr4M2bLO5Y6McPSEp">🍜</div>
+      <div data-page-node-id="2GEqBoqaVwCYEOsHGXSjsw"><h1 data-page-node-id="Op3Fy6ENoEdgQX42DFxSOY">譚仔回響</h1><small data-page-node-id="7wnFqtjwk18udGZxfHTWpW">TAMJAI RESPONDER · v3.2</small></div>
+    </div>
+    <nav id="nav" data-page-node-id="jBiDMtund4vSBMEj4iJpN4">
+      <div class="grp" data-page-node-id="efU8rRB8WEba0oW0F26szJ">決策視角</div>
+      <a href="#" data-p="dashboard" class="on" data-page-node-id="McktDYiyVzeZ45BxmGPNDk"><span class="ic" data-page-node-id="y1PpNn7s88HRQUGIuAAdRx">📊</span>總覽 Dashboard</a>
+      <a href="#" data-p="inbox" data-page-node-id="wNmRZdwk8nQ0q31XwXFNxw"><span class="ic" data-page-node-id="LLmZwnLy6Vyc32qt8jpiBh">📇</span>意見收件箱<span class="cnt" id="nav-inbox" data-page-node-id="yUoCJEBHnoWjVQk8aI87VQ">6</span></a>
+      <a href="#" data-p="drafts" data-page-node-id="r2hywiTgcd71u8gpPKYqx6"><span class="ic" data-page-node-id="g4bUDzcMYC1Fc9qTqEb4J8">✍️</span>AI 草稿審批<span class="cnt" id="nav-drafts" data-page-node-id="LGGxzkOO6rqzGvzLtZfhYE">3</span></a>
+      <div class="grp" data-page-node-id="6C0BV8kQVgXL7HhILN4LGF">分析</div>
+      <a href="#" data-p="signals" data-page-node-id="pEbphYVe2CkcdgR9wtD0rF"><span class="ic" data-page-node-id="smDkI88YiANdzmHiR3nSNS">🛡️</span>真假分析</a>
+      <a href="#" data-p="hotspots" data-page-node-id="Gkry0pOCjUMzH9VSsDQrrh"><span class="ic" data-page-node-id="rYGHlGldIdKBlPKmfM1YoQ">🔥</span>門店/時段熱點地圖</a>
+      <a href="#" data-p="radar" data-page-node-id="1euZ4N3j6lsF4GDeKD8tci"><span class="ic" data-page-node-id="l7xJWNkOHZX9XkulE0QGw0">🌡️</span>辣度雷達 · 辣度個案</a>
+      <div class="grp" data-page-node-id="eMERAl9M7vhFYP36G9hR6g">運營</div>
+      <a href="#" data-p="brief" data-page-node-id="ztaJLc0B90Y4OJFjCuFawE"><span class="ic" data-page-node-id="WLQEWVZLj8b24k3J9JlSnV">📰</span>每週決策簡報</a>
+      <a href="#" data-p="upload" data-page-node-id="4lrUOZAtfSpvDXUdRVh3Xu"><span class="ic" data-page-node-id="ZKcl6Ka7pAtSiFEGg9I66E">⬆️</span>人工上傳</a>
+      <a href="#" data-p="audit" data-page-node-id="usDSn3VFkJbQ6hLUHgyJTd"><span class="ic" data-page-node-id="ZbGJlSdlLbrts0soKL4q7h">🧾</span>審計日誌<span class="cnt" id="nav-audit" data-page-node-id="qC5b9TtLQHLujHjGc2Jz6G">2</span></a>
+      <a href="#" data-p="settings" data-page-node-id="d9cLhDy2JJkQ7GVj7fqPoV"><span class="ic" data-page-node-id="IYFRTWbmsgYLk3p88FLyog">⚙️</span>設定</a>
+    </nav>
+    <div class="side-foot" data-page-node-id="MDvHSEw6mpPM0XC1kXRgJO">
+      <div class="rowline" style="margin-bottom:6px" data-page-node-id="xg36OrPlJCDTMRmFhauWDM"><span class="avatar" data-page-node-id="lSEt1DJMAiBDJtyH4YRmA9">G</span><div data-page-node-id="rLFXLiOPZo1BmiYFW9dLDo"><b data-page-node-id="3N2Fa1atyeGb7npituFQgE">訪客模式</b><br data-page-node-id="ZMzIHWMRJkfRaNhUyLCEtG"><span style="font-size:11px" data-page-node-id="POGRIMSqghlmNV4AGrO9R7">唯讀 + 生成草稿</span></div></div>
+      <button class="btn ghost sm" style="width:100%;justify-content:center" onclick="switchAccount()" data-page-node-id="hNPMvW32C1pQGmjmGldSYt">切換帳號</button>
+      <div style="margin-top:10px;font-size:10.5px" data-page-node-id="EUgyg0nio1h9SN350DVJ0x">UI/UX 原型 · 本地模擬數據<br data-page-node-id="gAEGUH5MiEBQbQGkJZLPMI">無後端 · 無資料庫連接</div>
+    </div>
+  </aside>
+
+  <!-- ================= 主區 ================= -->
+  <main id="main" data-page-node-id="J3UEzOsOsnSvCp8bDSF6AL">
+    <div class="banner" data-page-node-id="D90zBAufGgWvMlWWbEnGvI">🧪 <b data-page-node-id="UgYlxwHT8YMT2tTKew1WAZ">原型演示模式</b>：所有數據均為虛構、去識別化種子資料；操作僅作用於頁面狀態，不寫入任何資料庫。AI 永不自動發布——人類批准後才導出。</div>
+    <div id="topbar" data-page-node-id="75IHuxqUKQ6vovBF6LpSGC">
+      <div data-page-node-id="cf0HYPV7Bw2TKlQoXpquD8"><h2 id="pg-title" data-page-node-id="BWTjEjQMfCKTStDAWqFFEd">總覽 Dashboard</h2><div class="sub" id="pg-sub" data-page-node-id="OBXDT95AQcC509aYgEHUeX">香港 · 三平台（OpenRice / Keeta / Foodpanda）</div></div>
+      <div class="spacer" data-page-node-id="f5CxpMZiu1VERvtsje5m61"></div>
+      <span class="pill" data-page-node-id="7ab5wKhVJsUBfWgwrZR84C"><span class="dot" style="background:var(--ok)" data-page-node-id="1x6jtnzVQnb7rZCaM5GiyK"></span>管線運行中</span>
+      <span class="pill" data-page-node-id="hbBzzN9x4IEKiCUJHExDt7">2026-10-28 · 03:45</span>
+    </div>
+    <div id="page" data-page-node-id="RuAvmtZJ6cIsFnKfIVK9NM"></div>
+  </main>
+</div>
+
+<!-- 證據卡抽屜 -->
+<div id="mask" onclick="closeDrawer()" data-page-node-id="TgbQkoKEksaQXcy0X8iT0i"></div>
+<div id="drawer" data-page-node-id="FNeDFmqNNUAggvy3qfHUgf">
+  <div class="dh" data-page-node-id="YHHBWyzncIwYBkzBj5FYpR"><span style="font-size:18px" data-page-node-id="SAAxKmn8DZmRQrVHeIwoDu">📇</span><b id="dw-title" data-page-node-id="wcqJlcC6FelsJgZXtu6nmc">證據卡</b><div class="spacer" data-page-node-id="NYWhClAdfAy6kiAZIh7vzS"></div>
+    <button class="btn subtle sm" onclick="closeDrawer()" data-page-node-id="SRbKxJrcrGshuWOWWB735h">✕ 關閉</button></div>
+  <div class="db" id="dw-body" data-page-node-id="szwXUMILCayIGxoNex2jcu"></div>
+</div>
+<div id="toast" data-page-node-id="jxC2rJWgVpU40E0nEdWAfW"></div>
+
+<!-- 原因輸入彈窗（所有真假操作必填原因） -->
+<div id="modal">
+  <div class="mbox">
+    <b class="mt" id="mo-title">操作原因</b>
+    <div class="mdesc" id="mo-desc"></div>
+    <div id="mo-choices"></div>
+    <textarea id="mo-reason" rows="3" placeholder="必填：說明為何做這個判斷／操作（會寫入審計日誌）"></textarea>
+    <div class="rowline" style="margin-top:12px;justify-content:flex-end">
+      <button class="btn ghost sm" onclick="closeModal()">取消</button>
+      <button class="btn primary sm" id="mo-ok" onclick="modalOk()">確認 · 寫入審計</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==================== 模擬數據（虛構種子） ==================== */
+const M = [
+ {id:1201, plat:"OpenRice", star:1, lang:"粵語口語", store:"銅鑼灣店", item:"麻辣米線", sentiment:"neg", severity:"P0", topic:"衛生食安",
+  text:"今晚喺銅鑼灣店食到半隻蜢，同朋友都嘔咗，打去店家只係話會反映……有冇人一齊投訴？", time:"今天 22:14", authentic:"natural", score:12, cluster:"C-85",
+  link:"https://openrice.example/r/1201", evidence:[{t:"原文截圖存檔",u:"#"},{t:"同群組關聯討論 ×3",u:"#"}],
+  signals:[["r","短時間同IP群集","3 小時內 4 帖同訴求，時間間隔 <20 分鐘"],["g","帳號歷史正常","註冊 2 年，38 條真實食評"],["y","情緒強烈但具體","有具體菜品+時間+症狀，非模板化"],["g","語言自然","粵語口語，非機翻痕跡"],["y","跨平台共鳴","Keeta 有 1 條相似（弱關聯）"]]},
+ {id:1202, plat:"Keeta", star:2, lang:"繁中", store:"旺角店", item:"酸辣湯底", sentiment:"neg", severity:"P1", topic:"出餐速度",
+  text:"叫咗外賣等咗 75 分鐘，送到已經凍晒，個湯完全唔辣，好失望。客服只係覆範本。", time:"今天 21:02", authentic:"natural", score:88,
+  link:"https://keeta.example/o/1202", evidence:[{t:"訂單編號（去識別化）",u:"#"},{t:"配送時長記錄",u:"#"}],signals:[]},
+ {id:1203, plat:"Foodpanda", star:5, lang:"英文", store:"尖沙咀店", item:"三哥檸檬樂", sentiment:"pos", severity:"P3", topic:"服務態度",
+  text:"Staff at TST branch were super friendly, the lemon drink was a lifesaver in this heat. Will order again!", time:"今天 19:47", authentic:"natural", score:94,
+  link:"https://foodpanda.example/r/1203", evidence:[{t:"原文連結",u:"#"}],signals:[]},
+ {id:1204, plat:"OpenRice", star:1, lang:"簡中", store:"沙田店", item:"招牌米線", sentiment:"neg", severity:"P2", topic:"性價比",
+  text:"加钱升级小食就两块鱼蛋，性价比越来越低了，隔壁品牌同价位给得更多。", time:"今天 18:30", authentic:"suspect", score:41, cluster:"C-77",
+  link:"https://openrice.example/r/1204", evidence:[{t:"原文連結",u:"#"},{t:"競品對比帳號關聯 ×2",u:"#"}],
+  signals:[["r","模板化句式","與 6 條歷史帖相似度 >0.85"],["r","帳號行為單一","僅發佈該品牌負評，無其他內容"],["y","發帖時段異常","集中於 18:00–19:00 廣告時段"],["g","圖片非盜用","EXIF 自拍環境"],["g","語言自然","無機翻痕跡"]]},
+ {id:1205, plat:"Keeta", star:3, lang:"繁中", store:"觀塘店", item:"番茄湯底", sentiment:"neu", severity:"P2", topic:"辣度標示",
+  text:"中辣幾好食，但每次辣度都唔同，建議標準化。環境就冇得彈。", time:"今天 17:11", authentic:"natural", score:90,
+  link:"https://keeta.example/o/1205", evidence:[{t:"訂單編號（去識別化）",u:"#"}],signals:[]},
+ {id:1206, plat:"OpenRice", star:1, lang:"粵語口語", store:"銅鑼灣店", item:"麻辣米線", sentiment:"neg", severity:"P1", topic:"衛生食安",
+  text:"屋企人都話近期銅鑼灣店出品唔穩，湯底有陣異味，唔知係咪換咗供應商。", time:"昨天 21:55", authentic:"natural", score:76, cluster:"C-85",
+  link:"https://openrice.example/r/1206", evidence:[{t:"原文連結",u:"#"}],signals:[]},
+ {id:1207, plat:"OpenRice", star:1, lang:"繁中", store:"沙田店", item:"過橋米線", sentiment:"neg", severity:"P2", topic:"排隊",
+  text:"週末晚市排足 45 分鐘，攞飛系統又冇顯示前面有幾多枱，等到好攰。", time:"昨天 20:18", authentic:"natural", score:86, cluster:"C-79",
+  link:"https://openrice.example/r/1207", evidence:[{t:"原文連結",u:"#"},{t:"排隊時長記錄",u:"#"}],signals:[]},
+ {id:1208, plat:"OpenRice", star:2, lang:"繁中", store:"尖沙咀店", item:"三哥米線", sentiment:"neg", severity:"P2", topic:"服務",
+  text:"午市樓面明顯唔夠人，加水要叫三次，最後自己走去櫃檯攞。", time:"昨天 13:40", authentic:"natural", score:89,
+  link:"https://openrice.example/r/1208", evidence:[{t:"原文連結",u:"#"}],signals:[]},
+ {id:1209, plat:"OpenRice", star:1, lang:"簡中", store:"灣仔店", item:"招牌米線", sentiment:"neg", severity:"P2", topic:"價格",
+  text:"加价后份量没变，性价比完全不行，同一条街有更好选择，不会再来了。", time:"前天 12:26", authentic:"suspect", score:38, cluster:"C-77",
+  link:"https://openrice.example/r/1209", evidence:[{t:"原文連結",u:"#"},{t:"同群集文本相似度 0.83",u:"#"}],
+  signals:[["r","模板化句式","與群集 #C-77 中 5 條文本相似度 >0.8"],["r","帳號行為單一","僅 3 條食評，全部為同區競品比較"],["y","時間集中","與同群集 3 帖同一小時內發佈"],["g","有具體價格","提及實際加價幅度"],["g","語言自然","無機翻痕跡"]]},
+ {id:1210, plat:"OpenRice", star:2, lang:"粵語口語", store:"銅鑼灣店", item:"麻辣米線", sentiment:"neg", severity:"P2", topic:"份量",
+  text:"份量時多時少，今次明顯少咗三分之一，同價錢唔成正比。", time:"前天 12:05", authentic:"natural", score:91,
+  link:"https://openrice.example/r/1210", evidence:[{t:"原文連結",u:"#"}],signals:[]},
+ {id:1211, plat:"Foodpanda", star:2, lang:"繁中", store:"荃灣店", item:"酸辣米線（外賣）", sentiment:"neg", severity:"P2", topic:"外賣包裝",
+  text:"湯同米線分開裝係好，但今次又漏汁，成個袋都係辣油，紙袋穿咗。", time:"昨天 19:32", authentic:"natural", score:87, cluster:"C-81",
+  link:"https://foodpanda.example/r/1211", evidence:[{t:"訂單編號（去識別化）",u:"#"}],signals:[]},
+ {id:1212, plat:"OpenRice", star:3, lang:"繁中", store:"鰂魚涌店", item:"下午茶套餐", sentiment:"neu", severity:"P3", topic:"服務",
+  text:"下午茶時段收檯慢，叫埋單等咗十分鐘，食物本身冇問題。", time:"前天 16:48", authentic:"natural", score:90,
+  link:"https://openrice.example/r/1212", evidence:[{t:"原文連結",u:"#"}],signals:[]},
+ {id:1213, plat:"OpenRice", star:1, lang:"粵語口語", store:"旺角店", item:"麻辣米線", sentiment:"neg", severity:"P1", topic:"排隊",
+  text:"排隊 40 分鐘先有位，晚市全場爆滿，連吧檯都坐滿，等嘅時候冇人講要等幾耐。", time:"今天 20:52", authentic:"natural", score:78, cluster:"C-79",
+  link:"https://openrice.example/r/1213", evidence:[{t:"原文連結",u:"#"}],signals:[]},
+ {id:1214, plat:"Keeta", star:1, lang:"繁中", store:"旺角店", item:"酸辣湯底", sentiment:"neg", severity:"P0", topic:"衛生食安",
+  text:"檯面有漬，餐具似冇洗淨，同店員講咗都只係抹一抹，唔敢再用。", time:"今天 21:40", authentic:"natural", score:24, cluster:"C-85",
+  link:"https://keeta.example/o/1214", evidence:[{t:"原文截圖存檔",u:"#"}],
+  signals:[["g","帳號歷史正常","註冊 1 年，21 條食評"],["y","情緒強烈但具體","有具體位置與店員反應"],["g","語言自然","粵語口語"],["g","無群集關聯","未命中任何水軍群集"]]},
+];
+/* ==================== 帳戶真假分析 · 五信號 / 三狀態 / 一句話 ==================== */
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* 判斷結果：只有三種 */
+const AUTH_VD={
+  authentic:{ic:"✅",name:"真實",cls:"green"},
+  suspicious:{ic:"⚠",name:"可疑",cls:"amber"},
+  inauthentic:{ic:"⛔",name:"可能不真實",cls:"red"}};
+/* 信號狀態：只有三種，不顯示權重與小數 */
+const AUTH_ST={normal:["✅","正常","green"],watch:["⚠","留意","amber"],suspicious:["⛔","可疑","red"]};
+
+/* 五個信號（第六個「正反比例」為參考，不單獨觸發總判斷） */
+const AUTH_SIGS=[
+ {k:"accounts",name:"帳號數量",q:"相似帖來自多少個不同帳號",show:v=>v+" 個帳號"},
+ {k:"span",name:"時間集中",q:"相似帖是否集中在短時間",show:v=>v>=48?Math.round(v/24)+" 天內":v+" 小時內"},
+ {k:"text",name:"文本重複",q:"相似帖文字是否几乎一樣",show:v=>v+"% 相近"},
+ {k:"cross",name:"跨平台同步",q:"同一內容是否在多個平台同時出現",show:v=>v===0?"否":v+" 個平台同時"},
+ {k:"newacc",name:"新帳號比例",q:"發帖帳號是否多為新註冊／低活動",show:v=>v+"% 為新帳號"}];
+
+function authSigState(k,v){
+  if(k==="accounts")return v>=5?"normal":v>=3?"watch":"suspicious";
+  if(k==="span")return v>=72?"normal":v>24?"watch":"suspicious";
+  if(k==="text")return v<50?"normal":v<=80?"watch":"suspicious";
+  if(k==="cross")return v===0?"normal":v===1?"watch":"suspicious";
+  return v<30?"normal":v<=60?"watch":"suspicious";
+}
+function authStates(c){const o={};AUTH_SIGS.forEach(s=>o[s.k]=authSigState(s.k,c[s.k]));return o}
+function authCounts(states){
+  return {s:AUTH_SIGS.filter(s=>states[s.k]==="suspicious").length,
+          w:AUTH_SIGS.filter(s=>states[s.k]==="watch").length};
+}
+/* 總判斷：≥3 可疑 → 可能不真實；1–2 可疑或 ≥2 留意 → 可疑；其餘 → 真實 */
+function authVerdictOf(states){
+  const {s,w}=authCounts(states);
+  if(s>=3)return "inauthentic";
+  if(s>=1||w>=2)return "suspicious";
+  return "authentic";
+}
+function authClause(k,v,state){
+  const tag=state==="suspicious"?"可疑":"留意";
+  const m={accounts:`來自 ${v} 個帳號`,span:`集中 ${v>=48?Math.round(v/24)+" 天":v+" 小時"}`,
+    text:`文本 ${v}% 相同`,cross:`跨 ${v} 個平台同步`,newacc:`新帳號 ${v}%`};
+  return m[k]+`（${tag}）`;
+}
+/* 一句話解釋（自動生成，不出現權重／小數） */
+function authExplain(c,states){
+  states=states||authStates(c);
+  const sus=[],wat=[];
+  AUTH_SIGS.forEach(s=>{
+    const st=states[s.k];
+    if(st==="suspicious")sus.push(authClause(s.k,c[s.k],st));
+    else if(st==="watch")wat.push(authClause(s.k,c[s.k],st));
+  });
+  const v=authVerdictOf(states);
+  const tail=v==="inauthentic"?"→ 可能不真實。":v==="suspicious"?"→ 可疑，先人工覆核。":"→ 未見異常，判定真實。";
+  if(!sus.length&&!wat.length)
+    return `${c.mentions} 條相似帖來自 ${c.accounts} 個帳號、分散 ${Math.round(c.span/24)} 天、文本 ${c.text}% 相同 ${tail}`;
+  return `${c.mentions} 條相似帖${[...sus,...wat].join("、")} ${tail}`;
+}
+
+/* 群集種子（去識別化；帳號以 A/B/C 代號表示，不建個人畫像） */
+const AUTH_CLUSTERS=[
+ {id:"C-77",label:"性價比／競品對比",topic:"價格",stores:"沙田店 · 灣仔店",plats:{OpenRice:12},
+  mentions:12,accounts:2,span:2,text:90,cross:0,newacc:40,contra:1,caseId:"SP-05",
+  samples:[["帳號 A","OpenRice","今天 18:30","加钱升级小食就两块鱼蛋，性价比越来越低了…"],
+           ["帳號 B","OpenRice","今天 18:52","加价后份量没变，性价比完全不行，同一条街有更好选择…"],
+           ["帳號 A","OpenRice","今天 19:04","隔壁品牌同价位给得更多，不会再来了…"]]},
+ {id:"C-79",label:"晚市排隊延誤",topic:"排隊",stores:"旺角店 · 沙田店",plats:{OpenRice:5,Keeta:3},
+  mentions:8,accounts:3,span:20,text:55,cross:0,newacc:35,contra:2,caseId:"SP-03",
+  samples:[["帳號 A","OpenRice","今天 20:52","排隊 40 分鐘先有位，晚市全場爆滿…"],
+           ["帳號 B","OpenRice","今天 21:10","晚市等咗 40 分鐘，前面仲有 12 枱冇人講…"],
+           ["帳號 C","Keeta","今天 21:35","等位等到凍，建議加開晚市時段…"]]},
+ {id:"C-81",label:"外賣包裝漏汁",topic:"外賣包裝",stores:"荃灣店 · 觀塘店",plats:{Foodpanda:4,Keeta:2},
+  mentions:6,accounts:5,span:48,text:60,cross:1,newacc:45,contra:3,caseId:"SP-08",
+  samples:[["帳號 A","Foodpanda","昨天 19:32","湯同米線分開裝係好，但今次又漏汁…"],
+           ["帳號 B","Foodpanda","昨天 20:05","成個袋都係辣油，紙袋穿咗…"],
+           ["帳號 C","Keeta","前天 18:40","漏汁漏到成手都係，包裝要改…"]]},
+ {id:"C-85",label:"出品與衛生",topic:"衛生",stores:"銅鑼灣店 · 旺角店",plats:{OpenRice:6,Keeta:3},
+  mentions:9,accounts:9,span:120,text:35,cross:0,newacc:20,contra:4,caseId:"SP-01",
+  samples:[["帳號 D","OpenRice","今天 22:14","今晚喺銅鑼灣店食到半隻蜢，同朋友都嘔咗…"],
+           ["帳號 E","Keeta","今天 21:40","檯面有漬，餐具似冇洗淨…"],
+           ["帳號 F","OpenRice","昨天 21:55","湯底有陣異味，唔知係咪換咗供應商…"]]},
+ {id:"C-88",label:"午市樓面人手",topic:"服務",stores:"尖沙咀店 · 鰂魚涌店",plats:{OpenRice:5,Foodpanda:1},
+  mentions:6,accounts:6,span:96,text:30,cross:0,newacc:15,contra:3,caseId:"SP-06",
+  samples:[["帳號 G","OpenRice","昨天 13:40","午市樓面明顯唔夠人，加水要叫三次…"],
+           ["帳號 H","Foodpanda","前天 16:48","下午茶時段收檯慢，叫埋單等咗十分鐘…"],
+           ["帳號 I","OpenRice","前天 13:12","午市等落單等咗 15 分鐘，食物本身冇問題…"]]}
+];
+
+/* 執行時狀態：覆核結果、排除、保留標記（原型只作用於頁面狀態） */
+let authState={filter:"all",override:{}};
+let selMentions=new Set();
+
+const authCluster=id=>AUTH_CLUSTERS.find(c=>c.id===id)||null;
+function authStateOfCluster(cl){
+  if(!cl)return "authentic";
+  if(authState.override[cl.id])return authState.override[cl.id];
+  if(cl.excluded)return "inauthentic";
+  return authVerdictOf(authStates(cl));
+}
+/* 對辣度／熱點的影響：⛔ 不計入；⚠ 計入但標記；保留但標記 → 計入 */
+function authCaseInfo(c){
+  const cl=authCluster(c&&c.cluster);
+  if(!cl)return {cl:null,st:"authentic",counted:true};
+  const st=authStateOfCluster(cl);
+  const counted=st==="inauthentic"?(!!cl.keepFlagged):true;
+  return {cl,st,counted};
+}
+function authOfMention(m){
+  const cl=authCluster(m&&m.cluster);
+  if(!cl)return {cl:null,st:"authentic"};
+  return {cl,st:authStateOfCluster(cl)};
+}
+function authBadge(v,cl){
+  const d=AUTH_VD[v]||AUTH_VD.authentic;
+  const tip=cl?esc(authExplain(cl,authStates(cl))):"未命中相似群集";
+  return `<span class="chip ${d.cls}" title="${tip}">${d.ic} ${d.name}</span>`;
+}
+/* 真假徽章 + 一句話原因（列表用） */
+function authInline(cl){
+  if(!cl)return `<span class="chip green" title="未命中相似群集：單帖、無重複文本">✅ 真實</span>`;
+  const v=authStateOfCluster(cl),d=AUTH_VD[v];
+  return `<span class="chip ${d.cls}" title="${esc(authExplain(cl,authStates(cl)))}">${d.ic} ${d.name}</span>`;
+}
+
+/* ---- 審計寫入：記錄操作者、前後判斷、原因、一句話快照 ---- */
+function authAudit(act,obj,before,after,reason,snapshot){
+  const now=new Date();
+  const t="今天 "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+  const riskMap={
+    recompute_authenticity:["r3","recompute_authenticity"],
+    review_authenticity:["r1","review_authenticity"],
+    exclude_mentions:["r2","bulk_exclude"],
+    keep_with_flag:["r2","suspicious_priority"],
+    toggle_authenticity_filter:["r3","toggle_authenticity_filter"],
+    mark_seen:["r3","—"]};
+  const risk=riskMap[act]||["r3","—"];
+  const b=AUTH_VD[before]?AUTH_VD[before].name:before, a=AUTH_VD[after]?AUTH_VD[after].name:after;
+  AUDIT.unshift({t,actor:ROLE==="guest"?"guest(沙盒)":ROLE,act,obj,risk,
+    detail:`before: ${b} → after: ${a}｜原因：${esc(reason)}${snapshot?"｜快照："+esc(snapshot):""}`});
+  const el=$("#nav-audit");if(el)el.textContent=(+el.textContent)+1;
+}
+
+/* ---- 操作原因彈窗（所有真假操作必填） ---- */
+let _moCb=null,_moChoice=null;
+function askReason(title,desc,cb,opts){
+  opts=opts||{};
+  $("#mo-title").textContent=title;
+  $("#mo-desc").innerHTML=desc||"";
+  $("#mo-reason").value=opts.preset||"";
+  const box=$("#mo-choices");
+  if(opts.choices&&opts.choices.length){
+    box.style.display="flex";
+    box.innerHTML=opts.choices.map((c,i)=>`<button class="btn ghost sm ${i===0?"on-sel":""}" data-v="${c.v}" onclick="moChoose(this)">${c.t}</button>`).join("");
+    _moChoice=opts.choices[0].v;
+  }else{box.style.display="none";box.innerHTML="";_moChoice=null}
+  _moCb=cb;
+  $("#modal").classList.add("on");
+  setTimeout(()=>$("#mo-reason").focus(),60);
+}
+function moChoose(btn){
+  [...btn.parentNode.children].forEach(b=>b.classList.remove("on-sel"));
+  btn.classList.add("on-sel");_moChoice=btn.dataset.v;
+}
+function closeModal(){$("#modal").classList.remove("on");_moCb=null}
+function modalOk(){
+  const v=$("#mo-reason").value.trim();
+  if(v.length<2){toast("原因為必填（至少 2 個字）——所有真假操作都要可追溯");return}
+  const cb=_moCb;const ch=_moChoice;closeModal();cb&&cb(v,ch);
+}
+
+/* ---- 四個操作：重算 / 標記誤判 / 排除 / 保留但標記 ---- */
+function authRecompute(cid){
+  const cl=authCluster(cid);if(!cl)return;
+  askReason("重算真假信號 · 群集 "+cid,
+    "重新計算五個信號與總判斷（原型：以本地指標重算，不呼叫任何外部 API）。",
+    r=>{
+      const before=authStateOfCluster(cl),after=authStateOfCluster(cl);
+      authAudit("recompute_authenticity","群集 "+cid,before,after,r,authExplain(cl,authStates(cl)));
+      render();authOpen(cid);
+      toast(before===after?"重算完成：五個信號未變，維持「"+AUTH_VD[after].name+"」（已寫審計）":"重算完成："+AUTH_VD[before].name+" → "+AUTH_VD[after].name);
+    },{preset:"每週例行重算，核對五個信號是否仍成立"});
+}
+function authReview(cid){
+  const cl=authCluster(cid);if(!cl)return;
+  const cur=authStateOfCluster(cl);
+  askReason("標記誤判 · 群集 "+cid,
+    `人工覆核後改判（目前：<b>${AUTH_VD[cur].name}</b>）。改判會即時重算辣度，並保留原判斷於審計。`,
+    (r,v)=>{
+      const before=authStateOfCluster(cl);
+      authState.override[cl.id]=v;
+      const after=authStateOfCluster(cl);
+      authAudit("review_authenticity","群集 "+cid,before,after,r,authExplain(cl,authStates(cl)));
+      render();authOpen(cid);
+      toast("已改判：" + AUTH_VD[before].name + " → " + AUTH_VD[after].name + "（已寫審計）");
+    },{choices:[{v:"authentic",t:"✅ 覆核為真實"},{v:"suspicious",t:"⚠ 覆核為可疑"},{v:"inauthentic",t:"⛔ 覆核為可能不真實"}],
+       preset:"人工閱讀原文後，判斷為真實顧客反饋"});
+}
+function authExclude(cid){
+  const cl=authCluster(cid);if(!cl)return;
+  askReason("排除可疑帖 · 群集 "+cid,
+    `把 ${cl.mentions} 條相似帖從<b>辣度、熱點、趨勢</b>中排除；<b>不刪帖</b>，原文與審計全部保留。`,
+    r=>{
+      const before=authStateOfCluster(cl);
+      delete authState.override[cl.id];
+      cl.excluded=true;
+      const after=authStateOfCluster(cl);
+      authAudit("exclude_mentions","群集 "+cid,before,after,r,
+        `排除 ${cl.mentions} 條｜${authExplain(cl,authStates(cl))}`);
+      render();authOpen(cid);
+      toast("已排除 "+cl.mentions+" 條（不刪帖），辣度已重算並寫入審計");
+    },{preset:"群集五個信號中三項可疑，先排除不計入辣度，待本週末覆核"});
+}
+function authKeepFlag(cid){
+  const cl=authCluster(cid);if(!cl)return;
+  askReason("保留但標記 · 群集 "+cid,
+    `仍計入辣度，但保留「${AUTH_VD[authStateOfCluster(cl)].name}」標記；草稿需顯示覆核提示。`,
+    r=>{
+      const st=authStateOfCluster(cl);
+      cl.keepFlagged=true;cl.excluded=false;
+      authAudit("keep_with_flag","群集 "+cid,st,st,r,`保留計入（標記）｜${authExplain(cl,authStates(cl))}`);
+      render();authOpen(cid);
+      toast("已保留並標記：計入辣度，但回覆前需覆核（已寫審計）");
+    },{preset:"內容具體、有可查證細節，保留計入但需人工覆核"});
+}
+/* 「只看真實帖」：前端過濾並重算辣度，寫入審計 */
+function authToggleFilter(v,from){
+  askReason((v?"只看真實帖":"顯示全部帖")+" · 重算辣度",
+    v?"剔除 ⚠ 可疑與 ⛔ 可能不真實的帖後重算辣度；不影響原始資料。":"恢復計入全部帖（可疑帖僅標記）。",
+    r=>{
+      authState.filter=v?"real":"all";
+      spiceState.realOnly=v;
+      authAudit("toggle_authenticity_filter",(from||"真假分析")+" · 辣度雷達","實體=全部","實體="+(v?"只看真實帖":"全部"),r,
+        v?"已排除可疑帖並重算辣度":"恢復全部帖，可疑帖僅標記");
+      render();
+      toast(v?"只看真實帖：已剔除可疑帖並重算辣度（已寫審計）":"已恢復全部帖：可疑帖僅標記，不主導辣度");
+    },{preset:v?"示範用：先看只計真實帖時的辣度水平":"示範用：恢復全部帖作對比"});
+}
+
+/* ---- 真假分析面板（Evidence Card / 辣度個案 / 群集抽屜共用） ---- */
+function authPanel(cid,opts){
+  opts=opts||{};
+  const cl=authCluster(cid);
+  if(!cl){
+    return `<div class="auth"><div class="auth-hd">🛡️ 真假分析</div>
+      <div class="auth-line">此帖未命中任何相似群集（單帖、無重複文本、無時間集中）→ <b>✅ 真實</b>，正常計入辣度。</div>
+      <div class="hintbox">五個信號僅在出現相似群集時計算；本原型不接外部 API、不建個人畫像。</div></div>`;
+  }
+  const st=authStates(cl),v=authStateOfCluster(cl),d=AUTH_VD[v];
+  const {s:sus,w:wat}=authCounts(st);
+  const rows=AUTH_SIGS.map(s=>{
+    const state=st[s.k],sd=AUTH_ST[state];
+    return `<tr><td><b>${s.name}</b><br><small style="color:var(--muted)">${s.q}</small></td>
+      <td class="mono" style="white-space:nowrap">${s.show(cl[s.k])}</td>
+      <td style="white-space:nowrap"><span class="chip ${sd[2]}">${sd[0]} ${sd[1]}</span></td></tr>`;}).join("");
+  const contra=cl.contra||0;
+  const impact=v==="inauthentic"
+    ? "不計入辣度、熱點與趨勢（只監測）。如要回覆，草稿會標記「已覆核」並由 Guardrail 提示 <b>inauthentic_cited</b>。"
+    : v==="suspicious"
+    ? "計入辣度但標記「含可疑帖」；策略卡建議先人工覆核真假，草稿顯示「此帖可疑，回覆前請覆核」。"
+    : "正常計入辣度；可正常生成策略與草稿。";
+  const statusChip=cl.excluded?'<span class="chip red xline">已排除</span>':cl.keepFlagged?'<span class="chip amber">保留但標記</span>':"";
+  return `<div class="auth">
+    <div class="auth-hd">🛡️ 真假分析 · ${cl.mentions} 條相似帖
+      <span class="chip ${d.cls}">${d.ic} ${d.name}</span>${statusChip}
+      <div class="spacer"></div><small style="color:var(--muted);font-weight:400">群集 ${cl.id} · ${cl.label}</small></div>
+    <div class="auth-line"><b>一句話：</b>${authExplain(cl,st)}</div>
+    <table class="atbl"><thead><tr><th style="width:46%">信號</th><th>實測</th><th>狀態</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="rowline" style="margin-top:8px;flex-wrap:wrap;gap:6px;font-size:11.5px;color:var(--muted)">
+      <span class="chip gray">參考 · 正反比例</span>
+      <span>同期反證帖 <b style="color:var(--ink)">${contra}</b> 條${contra?"（有正常討論，非單向負評）":"（同期只有負評）"}</span>
+      <span class="chip ${contra?"green":"amber"}">${contra?"✅ 有反證":"⚠ 零正面，提示覆核"}</span>
+    </div>
+    <div class="hintbox">總判斷：${sus} 項「可疑」、${wat} 項「留意」 → <b style="color:var(--ink)">${d.ic} ${d.name}</b>。${sus>=3?"（≥3 項可疑）":(sus>=1||wat>=2)?"（1–2 項可疑 或 ≥2 項留意）":"（0 項可疑且留意 ≤1）"}<br>
+      <b>影響：</b>${impact}</div>
+    <div style="margin-top:10px"><b style="font-size:12px">相似帖（去識別化）</b>
+      ${(cl.samples||[]).map(s=>`<div class="sample"><span class="chip gray mono">${s[0]}</span><span class="chip ${platChip(s[1])}">${s[1]}</span><span style="flex:1">${esc(s[3])}</span><small style="color:var(--muted);white-space:nowrap">${s[2]}</small></div>`).join("")}
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">只顯示去識別化帳號代號、平台、時間；不建個人畫像、不抓私信。</div></div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn ghost sm" onclick="authRecompute('${cl.id}')">🔄 重算</button>
+      <button class="btn ghost sm" onclick="authReview('${cl.id}')">✍️ 標記誤判</button>
+      <button class="btn ghost sm" onclick="authExclude('${cl.id}')">🚫 排除可疑帖</button>
+      <button class="btn ghost sm" onclick="authKeepFlag('${cl.id}')">📌 保留但標記</button>
+      <button class="btn ghost sm" onclick="authToggleFilter(${spiceState.realOnly?"false":"true"},"真假分析")">${spiceState.realOnly?"👁 顯示全部帖":"👁 只看真實帖"}</button>
+      ${opts.close?"":""}
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:8px">所有操作需填原因，記錄操作者、前後判斷與一句話快照；不因標籤自動刪帖。</div>
+  </div>`;
+}
+function authOpen(cid){
+  const cl=authCluster(cid);if(!cl)return;
+  $("#dw-title").textContent="真假分析 · 群集 "+cid;
+  $("#dw-body").innerHTML=`<div class="rowline" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">
+      <span class="chip">${cl.label}</span><span class="chip">${cl.topic}</span>
+      <span class="chip gray">${cl.stores}</span></div>
+    ${authPanel(cid)}
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn ghost" onclick="closeDrawer()">關閉</button></div>`;
+  $("#drawer").classList.add("open");$("#mask").classList.add("on");
+}
+/* ===== Reply Workbench · 四語言／語體 × 兩種語氣（真誠道歉 / 專業回應）· 可無限次重新生成 ===== */
+const DRAFT_LANGS=[
+ {code:"en",name:"英文",full:"English"},
+ {code:"zh-Hans",name:"簡體",full:"簡體中文"},
+ {code:"zh-Hant",name:"書面語",full:"繁體中文書面語"},
+ {code:"yue",name:"廣東話口語",full:"繁體粵語口語"},
+];
+const DRAFT_STYLES=[
+ {code:"short",name:"簡短",desc:"1–2 句 · 公開快速回覆",limit:"≤ 40 字（中文）／≤ 25 words（英文）"},
+ {code:"formal",name:"正式",desc:"2–4 句 · S1/S2 官方回應",limit:"2–4 句 · 完整審慎"},
+];
+const DRAFTS = [
+ {mid:1201, sev:"S1", tone:"sincere", toneName:"真誠道歉", toneIc:"🙏", status:"pending", evidence:2,
+  refs:["EV-001","原文 #1201 · OpenRice","原文 #1201 · 留言"],
+  note:"S1 食安個案 · 預設「正式」 · 全文不含任何補償承諾",
+  i18n:{
+   "zh-Hant":{short:"非常抱歉昨晚在銅鑼灣店的不愉快經歷。涉事出品已即時下架送檢，門店亦已完成消毒覆查，請透過 cs@tamjai.demo 與我們聯絡跟進。",
+     formal:"您好，非常抱歉昨晚在銅鑼灣店為您帶來不愉快的用餐經歷。我們已於今日上午啟動食安覆查（個案 #1201）：涉事出品已即時下架並送交化驗，門店設備與流程亦已完成全面消毒檢查。閣下健康為先，請透過 cs@tamjai.demo 與我們聯絡，我們會安排專人跟進。再次向您致歉。"},
+   "zh-Hans":{short:"非常抱歉昨晚在铜锣湾店的不愉快经历。涉事出品已即时下架送检，门店亦已完成消毒复查，请通过 cs@tamjai.demo 与我们联系跟进。",
+     formal:"您好，非常抱歉昨晚在铜锣湾店给您带来不愉快的用餐经历。我们已于今日上午启动食安复查（个案 #1201）：涉事出品已即时下架并送交化验，门店设备与流程亦已完成全面消毒检查。您的健康为先，请通过 cs@tamjai.demo 与我们联系，我们会安排专人跟进。再次向您致歉。"},
+   "en":{short:"We are very sorry about your experience at our Causeway Bay store last night. The item has been withdrawn and sent for testing, and the store has been disinfected. Please contact us at cs@tamjai.demo so we can follow up.",
+     formal:"We are very sorry for the distressing experience at our Causeway Bay store last night. We began a food-safety review this morning (case #1201): the item concerned has been withdrawn from sale and sent for laboratory testing, and the store equipment and processes have undergone a full disinfection check. As your wellbeing comes first, please contact us at cs@tamjai.demo so a dedicated colleague can follow up. We apologise again."},
+   "yue":{short:"真係好抱歉昨晚喺銅鑼灣店嘅經歷。涉事出品已經即時下架送檢，門店亦都做咗消毒覆查，麻煩你透過 cs@tamjai.demo 同我哋聯絡跟進。",
+     formal:"你好，就昨晚喺銅鑼灣店嘅不快經歷，我哋向你衷心致歉。我哋今朝已經啟動食安覆查（個案 #1201）：涉事出品即時下架並送交化驗，門店嘅設備同流程亦已完成全面消毒檢查。你嘅健康最緊要，請透過 cs@tamjai.demo 同我哋聯絡，我哋會安排專人跟進。"}}},
+ {mid:1201, sev:"S1", tone:"pro", toneName:"專業回應", toneIc:"🧑‍💼", status:"pending", evidence:2,
+  refs:["EV-001","原文 #1201 · OpenRice","化驗所委託單（待補）"],
+  note:"含「48 小時內公佈」時效承諾 → Guardrail 會要求人工勾選確認",
+  i18n:{
+   "zh-Hant":{short:"感謝反映。我們已就 10 月 27 日晚銅鑼灣店的出品問題立案覆查（#1201），涉事批次已下架送檢。",
+     formal:"感謝您的反映。關於 10 月 27 日晚銅鑼灣分店的出品問題，我們已立案覆查（#1201），涉事批次已下架並送獨立化驗，結果將於 48 小時內公佈。期間該湯底暫停供應。如需進一步協助，請透過 cs@tamjai.demo 與我們聯絡。"},
+   "zh-Hans":{short:"感谢反映。我们已就 10 月 27 日晚铜锣湾店的出品问题立案复查（#1201），涉事批次已下架送检。",
+     formal:"感谢您的反映。关于 10 月 27 日晚铜锣湾分店的出品问题，我们已立案复查（#1201），涉事批次已下架并送独立化验，结果将于 48 小时内公布。期间该汤底暂停供应。如需进一步协助，请通过 cs@tamjai.demo 与我们联系。"},
+   "en":{short:"Thank you for your feedback. We have opened a review into the Causeway Bay store issue of 27 October (#1201) and withdrawn the batch for testing.",
+     formal:"Thank you for raising this. Regarding the product issue at our Causeway Bay store on 27 October, we have opened a review (#1201). The batch concerned has been withdrawn and sent for independent laboratory testing, with results to be announced within 48 hours; the soup base is suspended in the meantime. For further assistance, please contact cs@tamjai.demo."},
+   "yue":{short:"多謝你反映。我哋已經就 10 月 27 日晚銅鑼灣店嘅出品問題立案覆查（#1201），涉事批次已經下架送檢。",
+     formal:"多謝你嘅反映。關於 10 月 27 日晚銅鑼灣店嘅出品問題，我哋已經立案覆查（#1201），涉事批次已下架並送交獨立化驗，結果會喺 48 小時內公佈；期間該湯底暫停供應。如需進一步協助，請透過 cs@tamjai.demo 同我哋聯絡。"}}},
+ {mid:1202, sev:"S2", tone:"sincere", toneName:"真誠道歉", toneIc:"🙏", status:"pending", evidence:1,
+  refs:["EV-002","原文 #1202 · Foodpanda"],
+  note:"S2 配送爭議 · 預設「正式」 · 僅承諾 24 小時內跟進（與客服 SLA 一致）",
+  i18n:{
+   "zh-Hant":{short:"抱歉是次配送延誤，以及湯底溫度與辣度不符。我們已向配送夥伴反映，並把您的意見轉交旺角店廚房覆查。",
+     formal:"您好，對於是次配送延誤（75 分鐘）及湯底溫度、辣度不符，我們深感抱歉。已向配送夥伴反映該時段運力問題，並將您的回饋轉交旺角店廚房覆查湯底出品。閣下的訂單資料已記錄，專責同事會於 24 小時內跟進。"},
+   "zh-Hans":{short:"抱歉本次配送延误，以及汤底温度与辣度不符。我们已向配送伙伴反映，并把您的意见转交旺角店厨房复查。",
+     formal:"您好，对于本次配送延误（75 分钟）及汤底温度、辣度不符，我们深感抱歉。已向配送伙伴反映该时段运力问题，并将您的反馈转交旺角店厨房复查汤底出品。您的订单资料已记录，专责同事将于 24 小时内跟进。"},
+   "en":{short:"We are sorry for the delivery delay and for the temperature and spice level of your soup base. We have raised it with our delivery partner and the Mong Kok store kitchen.",
+     formal:"We are sorry for the 75-minute delivery delay and for the soup base arriving at the wrong temperature and spice level. We have raised the capacity issue with our delivery partner for that time slot and passed your feedback to the Mong Kok store kitchen for review. Your order details have been logged and a dedicated colleague will follow up within 24 hours."},
+   "yue":{short:"唔好意思，今次配送延誤咗，湯底溫度同辣度都唔啱。我哋已經同配送夥伴反映，亦轉交咗旺角店廚房覆查。",
+     formal:"你好，就今次配送延誤（75 分鐘）同湯底溫度、辣度不符，我哋深感抱歉。我哋已經向配送夥伴反映該時段嘅運力問題，並將你嘅意見轉交旺角店廚房覆查湯底出品。你嘅訂單資料已經記錄，專責同事會喺 24 小時內跟進。"}}},
+ {mid:1204, sev:"S1", tone:"pro", toneName:"專業回應", toneIc:"🧑‍💼", status:"rejected", evidence:0, fail:true, refs:[],
+  note:"證據不足（⛔ 可能不真實群集 C-77）· 四語言皆無法生成草稿",
+  i18n:{}},
+];
+
+/* ---- 多語言 Guardrail：禁用詞與承諾邊界（每次切換語言／風格都重跑） ---- */
+const GUARD_RULES={
+ "zh-Hant":[
+  {id:"GR-01",level:"block",sev:"S1",name:"禁用承諾",re:/退款|賠償|賠罪|保證不再發生|法律責任|贈送|送您一碗|送你一碗/,
+   why:"書面語禁用詞：退款／賠償／保證不再發生／法律責任（及變相補償：贈送、送您一碗）",
+   fix:"建議改寫：「我們已即時跟進並轉交相關團隊處理，不便之處敬請見諒。」"},
+  {id:"GR-02",level:"check",sev:"S2",name:"時效承諾",re:/\d+\s*小時內|\d+\s*個工作天/,
+   why:"具體時限屬對外承諾，需確認 SLA 並勾選後方可批准",
+   fix:"如需保留時限，請先確認客服 SLA：建議改為「我們會盡快跟進」。"},
+  {id:"GR-03",level:"hint",sev:"S3",name:"事實陳述需核實",re:/送檢|化驗|消毒|下架/,
+   why:"「已送檢／化驗／消毒」屬事實陳述，需門店或供應商書面確認後保留",
+   fix:"（提示）保留字句前，請向門店經理索取記錄編號。"}],
+ "zh-Hans":[
+  {id:"GR-01",level:"block",sev:"S1",name:"禁用承诺",re:/退款|赔偿|赔罪|保证不再发生|法律责任|赠送|送您一碗|送你一碗/,
+   why:"简体禁用词：退款／赔偿／保证不再发生／法律责任（及变相补偿：赠送、送您一碗）",
+   fix:"建议改写：「我们已即时跟进并转交相关团队处理，不便之处敬请见谅。」"},
+  {id:"GR-02",level:"check",sev:"S2",name:"时效承诺",re:/\d+\s*小时内|\d+\s*个工作日/,
+   why:"具体时限属对外承诺，需确认 SLA 并勾选后方可批准",
+   fix:"如需保留时限，请先确认客服 SLA：建议改为「我们会尽快跟进」。"},
+  {id:"GR-03",level:"hint",sev:"S3",name:"事实陈述需核实",re:/送检|化验|消毒|下架/,
+   why:"「已送检／化验／消毒」属事实陈述，需门店或供应商书面确认后保留",
+   fix:"（提示）保留字句前，请向门店经理索取记录编号。"}],
+ "en":[
+  {id:"GR-01",level:"block",sev:"S1",name:"Banned commitments",re:/refund|compensation|guarantee|legal liability|free bowl|on us/i,
+   why:"English banned terms: refund / compensation / guarantee / legal liability (plus disguised compensation: free bowl, on us)",
+   fix:"Suggested rewrite: “We have escalated this to the relevant team and will follow up as quickly as possible.”"},
+  {id:"GR-02",level:"check",sev:"S2",name:"Time commitment",re:/within \d+\s*(hours?|days?)|in \d+\s*hours?/i,
+   why:"A specific time window is a public commitment; confirm the SLA and tick to acknowledge",
+   fix:"If the window must stay, confirm the SLA first; otherwise use “as soon as possible”."},
+  {id:"GR-03",level:"hint",sev:"S3",name:"Factual claim",re:/testing|laborator|withdrawn|disinfect/i,
+   why:"Claims such as “sent for testing / disinfected” need written confirmation from the store or supplier",
+   fix:"(Hint) Obtain the store record reference before keeping this sentence."}],
+ "yue":[
+  {id:"GR-01",level:"block",sev:"S1",name:"禁用承諾",re:/退錢|退款|賠償|賠罪|保證唔會再發生|法律責任|送你一碗/,
+   why:"粵語禁用詞：退錢／賠償／保證唔會再發生／法律責任（及變相補償：送你一碗）",
+   fix:"建議改寫：「我哋已經即時跟進，並轉交相關團隊處理，唔好意思。」"},
+  {id:"GR-02",level:"check",sev:"S2",name:"時效承諾",re:/\d+\s*小時內|\d+\s*個工作天/,
+   why:"具體時限屬對外承諾，需確認 SLA 並勾選後方可批准",
+   fix:"如需保留時限，請先確認客服 SLA：建議改為「我哋會盡快跟進」。"},
+  {id:"GR-03",level:"hint",sev:"S3",name:"事實陳述需核實",re:/送檢|化驗|消毒|下架/,
+   why:"「已送檢／化驗／消毒」屬事實陳述，需門店或供應商書面確認後保留",
+   fix:"（提示）保留字句前，請向門店經理索取記錄編號。"}],
+};
+/* ---- 重新生成語句池：只保留「真誠道歉」與「專業回應」兩種語氣 ---- */
+const REGEN_VAR={
+ "zh-Hant":{
+  sincere:{marks:["非常抱歉","深感抱歉","我們深感抱歉","抱歉"],
+   open:["非常抱歉","深感抱歉","十分抱歉","萬分抱歉","非常愧疚"],
+   bridge:["您的意見已納入本次覆查範圍。","相關同事正逐一核對當日記錄。","我們已把詳情交予門店與品質團隊同步檢視。","我們正按既定程序逐項核對。"],
+   close:["感謝您的體諒。","謝謝您給我們改進的機會。","如仍有疑問，歡迎隨時與我們聯絡。","我們會持續向您交代進展。"]},
+  pro:{marks:["感謝您的反映","感謝反映","感謝您","謝謝您的意見"],
+   open:["感謝您的反映","謝謝您的意見","多謝您提供詳情","感謝您抽空告知我們"],
+   bridge:["我們已按既定程序記錄並轉交相關團隊覆核。","相關資料已交予門店與品質團隊同步檢視。","我們正逐項核對當日營運記錄。"],
+   close:["如有進一步資料，歡迎與我們聯絡。","我們會依程序完成覆核後再作回覆。","如需協助，請透過 cs@tamjai.demo 與我們聯絡。"]}},
+ "zh-Hans":{
+  sincere:{marks:["非常抱歉","深感抱歉","我们深感抱歉","抱歉"],
+   open:["非常抱歉","深感抱歉","十分抱歉","万分抱歉","非常愧疚"],
+   bridge:["您的意见已纳入本次复查范围。","相关同事正逐一核对当日记录。","我们已将详情交予门店与品质团队同步检视。","我们正按既定程序逐项核对。"],
+   close:["感谢您的体谅。","谢谢您给我们改进的机会。","如仍有疑问，欢迎随时与我们联络。","我们会持续向您交代进展。"]},
+  pro:{marks:["感谢您的反映","感谢反映","感谢您","谢谢您的意见"],
+   open:["感谢您的反映","谢谢您的意见","多谢您提供详情","感谢您抽空告知我们"],
+   bridge:["我们已按既定程序记录并转交相关团队复核。","相关资料已交予门店与品质团队同步检视。","我们正逐项核对当日营运记录。"],
+   close:["如有进一步资料，欢迎与我们联络。","我们会依程序完成复核后再作回复。","如需协助，请通过 cs@tamjai.demo 与我们联络。"]}},
+ "en":{
+  sincere:{marks:["We are very sorry","We are sorry","We are truly sorry","We sincerely apologise"],
+   open:["We are very sorry","We are truly sorry","We are deeply sorry","We are extremely sorry","We are sincerely sorry"],
+   bridge:["Your feedback has been added to this review.","Our colleagues are checking the records for that day.","The details have been shared with both the store and our quality team."],
+   close:["Thank you for your understanding.","Thank you for giving us the chance to improve.","Please let us know if you have any further questions.","We will keep you updated as the review progresses."]},
+  pro:{marks:["Thank you for your feedback","Thank you for raising this"],
+   open:["Thank you for your feedback","Thank you for your comments","Thank you for getting in touch","Thank you for the details"],
+   bridge:["This has been logged and passed to the relevant team for review.","The details have been shared with the store and quality teams.","We are checking the operational records for that day."],
+   close:["If you have further details, please let us know.","We will reply once the review is complete.","For assistance, please contact cs@tamjai.demo."]}},
+ "yue":{
+  sincere:{marks:["真係好抱歉","好抱歉","抱歉","唔好意思"],
+   open:["真係好抱歉","好抱歉","十分抱歉","真係好對唔住","非常唔好意思"],
+   bridge:["你嘅意見已經納入今次覆查範圍。","同事正逐一核對當日記錄。","我哋已經將詳情交畀門店同品質團隊一齊睇。","我哋正按既定程序逐項核對。"],
+   close:["多謝你體諒。","多謝你畀機會我哋改善。","如仲有疑問，歡迎隨時同我哋聯絡。","我哋會繼續向你交代進展。"]},
+  pro:{marks:["多謝你反映","多謝你嘅反映","多謝你","感謝你"],
+   open:["多謝你反映","多謝你提供詳情","感謝你抽空話畀我哋知","多謝你嘅意見"],
+   bridge:["我哋已經按程序記錄，並轉交相關團隊覆核。","相關資料已交畀門店同品質團隊同步檢視。","我哋正逐項核對當日營運記錄。"],
+   close:["如有進一步資料，歡迎同我哋聯絡。","我哋會完成覆核後再回覆你。","如需協助，請透過 cs@tamjai.demo 同我哋聯絡。"]}},
+};
+function regenPoolObj(){const p=REGEN_VAR[draftLang]||REGEN_VAR["zh-Hant"];return p[(DRAFTS[draftSel.d]&&DRAFTS[draftSel.d].tone==="pro")?"pro":"sincere"]}
+function regenCycle(arr,n){return arr[((Math.max(1,n)-1)%arr.length)]}
+/* 短版收尾語（只用於增加短版變化，不改變事實與承諾邊界） */
+const REGEN_TAG={
+ "zh-Hant":["","多謝體諒。","我們會再與您聯絡。"],
+ "zh-Hans":["","多谢体谅。","我们会再与您联系。"],
+ "en":["","Thank you for your patience.","We will be in touch again."],
+ "yue":["","多謝體諒。","我哋會再同你聯絡。"]};
+/* 依「語氣 × 語言 × 長度」重建草稿：開場句 × 跟進句／收尾句，每次組合不同；
+   產生的候選會去重並排除原稿，保證每次重新生成都得到新版本 */
+function regenBuild(i,n){
+  const d=DRAFTS[i], styleCode=draftStyleOf(i);
+  const base=baseTextOf(i);
+  if(!base)return null;
+  const pool=(REGEN_VAR[draftLang]||REGEN_VAR["zh-Hant"])[d.tone==="pro"?"pro":"sincere"];
+  const mark=pool.marks.find(m=>base.indexOf(m)>=0);
+  const mk=op=>mark?base.replace(mark,op):base;
+  const split=t=>{
+    const parts=draftLang==="en"
+      ? t.split(/(?<=[.!?])\s+(?=[A-Z0-9“"(])/g)
+      : t.split(/(?<=[。！？])/g);
+    return parts.map(x=>x.trim()).filter(Boolean);
+  };
+  const variants=[];
+  if(styleCode==="short"){
+    (REGEN_TAG[draftLang]||REGEN_TAG["zh-Hant"]).forEach(tag=>{
+      pool.open.forEach(op=>variants.push(mk(op)+(tag?(draftLang==="en"?" ":"")+tag:"")));
+    });
+  }else{
+    const SEP=draftLang==="en"?" ":"";
+    const bridgeBefore=(sents,br)=>{const a=sents.slice();a.splice(Math.max(1,a.length-1),0,br);return a.join(SEP)};
+    pool.open.forEach(op=>{
+      const sents=split(mk(op));
+      pool.bridge.forEach(br=>variants.push(bridgeBefore(sents,br)));
+      pool.close.forEach(cl=>variants.push(sents.concat([cl]).join(SEP)));
+    });
+  }
+  const uniq=[...new Set(variants)].filter(v=>v&&v!==base);
+  if(!uniq.length)return base;
+  return uniq[(Math.max(1,n)-1)%uniq.length];
+}
+const DRAFT_FAIL_MSG={
+ "zh-Hant":"此語言／語體暫無法生成，請人工編輯。",
+ "zh-Hans":"此语言／语体暂无法生成，请人工编辑。",
+ "en":"This language / register cannot be generated right now. Please edit manually.",
+ "yue":"呢個語言／語體暫時生成唔到，請人手編輯。"};
+
+const AUDIT = [
+ {t:"10-28 03:12", actor:"brand_manager", act:"approve", obj:"草稿 #D-4411（個案 1201）", risk:["r1","AL-03 同人同稿 ≥5 次修改"], detail:"before: pending → after: approved"},
+ {t:"10-28 02:58", actor:"cs_supervisor", act:"edit_draft", obj:"草稿 #D-4411", risk:["r2","證據連結將於 7 日後過期"], detail:"修改 27 字：移除補償承諾"},
+ {t:"10-28 02:41", actor:"AI pipeline", act:"guardrail_check", obj:"草稿 #D-4414", risk:["r1","inauthentic_cited"], detail:"S1 攔截：引用 ⛔ 群集 C-77 的帖（個案 1204）"},
+ {t:"10-28 02:20", actor:"cs_supervisor", act:"review_authenticity", obj:"群集 C-79", risk:["r1","review_authenticity"], detail:"before: 可疑 → after: 可疑（維持）｜原因：原文具體可查，暫維持覆核｜快照：8 條相似帖來自 3 個帳號（留意）、集中 20 小時（可疑）"},
+ {t:"10-28 01:30", actor:"system", act:"recompute_authenticity", obj:"群集 C-77", risk:["r3","recompute_authenticity"], detail:"before: 可能不真實 → after: 可能不真實｜原因：每週例行重算｜快照：12 條相似帖來自 2 個帳號（可疑）、集中 2 小時（可疑）、文本 90% 相同（可疑）"},
+ {t:"10-28 00:40", actor:"brand_manager", act:"keep_with_flag", obj:"群集 C-79", risk:["r2","suspicious_priority"], detail:"before: 可疑 → after: 可疑｜原因：內容具體、有可查證細節，保留計入但需覆核"},
+ {t:"10-27 23:47", actor:"guest(沙盒)", act:"create_mention", obj:"mention 1201", risk:["r3","demo_mode:true"], detail:"沙盒新增，actor=訪客"},
+];
+const HOT = {stores:["銅鑼灣店","旺角店","尖沙咀店","沙田店","觀塘店","荃灣店"], topics:["衛生食安","出餐速度","服務態度","辣度標示","性價比","環境"],
+ vals:[[5,1,0,2,1,0],[1,3,1,2,0,1],[0,1,0,1,0,0],[2,0,1,0,3,0],[1,2,0,1,0,0],[0,0,0,0,1,0]]};
+const RADAR = {topics:["衛生食安","出餐速度","服務態度","辣度標示","性價比","環境"], now:[92,64,38,55,48,30], prev:[58,55,40,50,45,32]};
+
+/* ==================== 框架 ==================== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let PAGE="dashboard", ROLE="guest", draftSel={d:0,tone:0};
+let draftLang="zh-Hant", draftStyleMap={}, draftAckMap={}, draftEditMap={}, draftEditOpen=false;
+let regenMap={}, regenView={}, draftToneFilter="all";
+const TITLES={dashboard:["總覽 Dashboard","香港 · 三平台（OpenRice / Keeta / Foodpanda）"],
+ inbox:["意見收件箱","證據卡必附連結 · 去識別化存儲"],
+ drafts:["AI 草稿審批","四語言／語體 × 兩種語氣（真誠道歉 / 專業回應）· 可無限次重新生成 · 人類批准門"],
+ signals:["真假分析 · 五信號","三個狀態 · 一句話解釋 · 操作必填原因並寫入審計"],
+ hotspots:["門店/時段熱點地圖","港島 / 九龍 / 新界 · 主題 × 時段聚合 · 補救清單（原型不接 GIS）"],
+ radar:["辣度雷達 · 辣度個案","Listening → Strategy → Replying · 草稿需人類批准後才導出"],
+ brief:["每週決策簡報","導出 PDF / CSV（需人類批准）"],
+ upload:["人工上傳","JSON / CSV / 貼上 三種輸入"],
+ audit:["審計日誌","append-only · 風險標記 AL-01–07"],
+ settings:["設定","資料源白名單 · 演示模式"]};
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),2400)}
+function switchAccount(){
+  ROLE = ROLE==="guest" ? "brand_manager" : "guest";
+  $(".avatar").textContent = ROLE==="guest" ? "G" : "經";
+  $(".side-foot b").textContent = ROLE==="guest" ? "訪客模式" : "品牌經理";
+  $(".side-foot span").textContent = ROLE==="guest" ? "唯讀 + 生成草稿" : "可批准 / 導出 / 批量操作";
+  toast(ROLE==="guest" ? "已切換為訪客（唯讀 + 生成草稿）" : "已切換為 brand_manager（可批准/導出）");
+  render();
+}
+$$("#nav a").forEach(a=>a.onclick=e=>{e.preventDefault();PAGE=a.dataset.p;
+  $$("#nav a").forEach(x=>x.classList.toggle("on",x===a));render();$("#main").scrollTop=0});
+function go(p){PAGE=p;$$("#nav a").forEach(x=>x.classList.toggle("on",x.dataset.p===p));render();$("#main").scrollTop=0}
+const platChip=p=>({OpenRice:"red",Keeta:"amber",Foodpanda:"blue"}[p]||"gray");
+const sevChip=s=>({P0:"red",P1:"amber",P2:"gray",P3:"gray",S1:"red",S2:"amber",S3:"gray"}[s]||"gray");
+const senChip=s=>({neg:"red",pos:"green",neu:"gray"}[s]);
+
+/* ==================== 各頁 ==================== */
+function pgDashboard(){
+  return `<div class="grid" style="grid-template-columns:repeat(4,1fr)">
+   ${[["今日新意見","24","▲ 3 對比昨日","up","📥"],["待審 AI 草稿","3","含 1 個 P0 個案","down","✍️"],
+      ["P0 食安事件","2","SLA 24h · 已通知法務","down","🚨"],["水軍嫌疑帖","5","群集 #C-77 · 12 條","down","🛡️"]]
+    .map(k=>`<div class="card kpi"><span class="em">${k[4]}</span><div class="lab">${k[0]}</div><div class="num">${k[1]}</div><div class="trend ${k[2].startsWith("▲")?"up":"down"}">${k[2]}</div></div>`).join("")}
+  </div>
+  <div class="grid" style="grid-template-columns:1.4fr 1fr;margin-top:16px">
+    <div class="card"><div class="hd">📈 近 7 日評論量與情緒 <small>虛構種子</small></div><div class="bd">
+      <svg class="spark" viewBox="0 0 300 56" preserveAspectRatio="none">
+        <polyline fill="none" stroke="#C8102E" stroke-width="2.5" points="0,40 42,34 84,38 126,22 168,28 210,14 252,20 300,10"/>
+        <polyline fill="none" stroke="#D8D4CC" stroke-width="2" stroke-dasharray="4 4" points="0,46 42,44 84,45 126,40 168,42 210,36 252,38 300,34"/>
+      </svg>
+      <div class="rowline" style="font-size:11.5px;color:var(--muted)"><span>10-22</span><div class="spacer"></div><span>今天</span></div>
+      <div class="rowline" style="margin-top:8px;font-size:12px"><span class="chip red">負面 ↑ 18%</span><span class="chip green">正面 32%</span><span class="chip gray">中性 50%</span></div>
+    </div></div>
+    <div class="card"><div class="hd">🥣 平台聲量分佈</div><div class="bd donut-wrap">
+      <svg width="120" height="120" viewBox="0 0 42 42">
+        <circle r="15.9" cx="21" cy="21" fill="none" stroke="#F0EDE6" stroke-width="7"/>
+        <circle r="15.9" cx="21" cy="21" fill="none" stroke="#E8552F" stroke-width="7" stroke-dasharray="52 48" stroke-dashoffset="25" stroke-linecap="butt"/>
+        <circle r="15.9" cx="21" cy="21" fill="none" stroke="#FFC72C" stroke-width="7" stroke-dasharray="27 73" stroke-dashoffset="-27"/>
+        <circle r="15.9" cx="21" cy="21" fill="none" stroke="#E4006B" stroke-width="7" stroke-dasharray="21 79" stroke-dashoffset="-54"/>
+        <text x="21" y="23" text-anchor="middle" font-size="7" font-weight="700" fill="#1C1B1A">69</text>
+      </svg>
+      <div class="legend">
+        <span><i style="background:#E8552F"></i>OpenRice 36 條 · 52%</span>
+        <span><i style="background:#FFC72C"></i>Keeta 16 條 · 23%</span>
+        <span><i style="background:#E4006B"></i>Foodpanda 17 條 · 25%</span>
+      </div>
+    </div></div>
+  </div>
+  <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:16px">
+    <div class="card"><div class="hd">🔥 本週熱議 Top 5</div><div class="bd">
+      ${[["衛生食安",92,"red"],["出餐速度",64,""],["辣度標示",55,""],["性價比",48,""],["服務態度",38,""]]
+      .map(t=>`<div class="wtopic"><span style="width:70px;font-size:12.5px;font-weight:600">${t[0]}</span><div class="bar"><i style="width:${t[1]}%;${t[2]?"background:linear-gradient(90deg,#C8102E,#8E0B22)":""}"></i></div><b style="font-size:12px">${t[1]}</b></div>`).join("")}
+    </div></div>
+    <div class="card"><div class="hd">🚨 需要決策</div><div class="bd">
+      <div style="padding:10px 12px;background:#FBE9EC;border-radius:10px;margin-bottom:10px">
+        <b style="color:var(--red)">P0 · 食安</b> — 銅鑼灣店「異物」個案（1201）草稿待批准，SLA 剩 <b>14h</b><br>
+        <button class="btn primary sm" style="margin-top:8px" onclick="go('drafts')">前往審批 →</button></div>
+      <div style="padding:10px 12px;background:#FFF3DC;border-radius:10px">
+        <b style="color:var(--warn)">P1 · 出餐速度</b> — 旺角店外賣延誤（1202），建議口徑已生成
+        <button class="btn ghost sm" style="margin-top:8px" onclick="openCard(1202)">查看證據卡</button></div>
+      <div style="padding:10px 12px;background:#FDF1E7;border-radius:10px;margin-top:10px">
+        <b style="color:#B96A00">🔥 九龍 Top1 熱點</b> — 旺角店 / 排隊 / 晚市 <b style="color:var(--red)">↑</b>
+        <span class="chip" style="margin-left:4px">負評 12</span><span class="chip amber">S2 × 3</span>
+        <button class="btn ghost sm" style="margin-top:8px" onclick="go('hotspots')">打開熱點地圖 →</button></div>
+      <div style="padding:10px 12px;background:#FBE9EC;border-radius:10px;margin-top:10px">
+        <b style="color:var(--red)">🌶 本週特辣 ${SPICE_CASES.filter(c=>c.sev==="S1").length} 條</b> — 待批准 ${SPICE_CASES.filter(c=>c.sev==="S1"&&!c.approved).length} 條
+        <span class="chip red" style="margin-left:4px">衛生 · 銅鑼灣／旺角</span>
+        <button class="btn ghost sm" style="margin-top:8px" onclick="go('radar')">打開辣度雷達 →</button></div>
+    </div></div>
+  </div>`;
+}
+let inboxState={plat:"all",sen:"all",auth:"all",q:""};
+function inboxSet(k,v){inboxState[k]=v;render()}
+function inboxList(){
+  return M.filter(m=>{
+    if(inboxState.plat!=="all"&&m.plat!==inboxState.plat)return false;
+    if(inboxState.sen!=="all"&&m.sentiment!==inboxState.sen)return false;
+    const st=authOfMention(m).st;
+    if(inboxState.auth==="real"&&st!=="authentic")return false;
+    if(inboxState.auth==="suspect"&&st!=="suspicious")return false;
+    if(inboxState.auth==="excluded"&&st!=="inauthentic")return false;
+    if(inboxState.q){
+      const hay=(m.text+" "+m.store+" "+m.topic+" "+m.item).toLowerCase();
+      if(!hay.includes(inboxState.q.toLowerCase()))return false;
+    }
+    return true;
+  });
+}
+function toggleSel(id,el){
+  if(selMentions.has(id))selMentions.delete(id);else selMentions.add(id);
+  render();
+}
+function bulkClusters(){
+  const s=new Set();
+  selMentions.forEach(id=>{const m=M.find(x=>x.id===id);const cl=authCluster(m&&m.cluster);if(cl)s.add(cl.id)});
+  return [...s].map(authCluster);
+}
+function bulkGuard(){
+  const cls=bulkClusters();
+  if(!selMentions.size){toast("請先勾選至少 1 條（單帖未命中群集時不支援群集操作）");return null}
+  if(!cls.length){toast("所選帖未命中任何相似群集：單帖無群集特徵，維持 ✅ 真實");return null}
+  return cls;
+}
+function bulkExclude(){
+  const cls=bulkGuard();if(!cls)return;
+  const posts=cls.reduce((a,c)=>a+c.mentions,0);
+  askReason(`排除所選 · ${selMentions.size} 條（涉及 ${cls.length} 個群集）`,
+    `把所選帖所屬群集共 <b>${posts} 條</b>從辣度、熱點、趨勢中排除；<b>不刪帖</b>，保留原文與審計。`,
+    r=>{
+      const before=cls.map(c=>AUTH_VD[authStateOfCluster(c)].name).join("／");
+      cls.forEach(c=>{delete authState.override[c.id];c.excluded=true});
+      authAudit("exclude_mentions","批量排除 · "+cls.map(c=>c.id).join(" / "),before,"可能不真實",r,
+        `排除 ${posts} 條；群集 `+cls.map(c=>c.id).join(" / "));
+      selMentions.clear();render();
+      toast("已排除 "+posts+" 條（不刪帖），辣度已重算並寫入審計");
+    },{preset:"批量覆核後確認為模板化／競品比較內容，先排除不計入辣度"});
+}
+function bulkReview(){
+  const cls=bulkGuard();if(!cls)return;
+  askReason(`標記誤判 · ${cls.length} 個群集`,
+    "人工覆核後改判所選帖所屬群集；原判斷與原因會保留在審計。",
+    (r,v)=>{
+      const before=cls.map(c=>AUTH_VD[authStateOfCluster(c)].name).join("／");
+      cls.forEach(c=>authState.override[c.id]=v);
+      authAudit("review_authenticity","批量改判 · "+cls.map(c=>c.id).join(" / "),before,AUTH_VD[v].name,r,
+        "人工覆核 "+selMentions.size+" 條");
+      selMentions.clear();render();
+      toast("已改判為「"+AUTH_VD[v].name+"」（已寫審計）");
+    },{choices:[{v:"authentic",t:"✅ 覆核為真實"},{v:"suspicious",t:"⚠ 覆核為可疑"},{v:"inauthentic",t:"⛔ 覆核為可能不真實"}],
+       preset:"人工閱讀原文與帳號歷史後，判定為真實顧客反饋"});
+}
+function bulkRecompute(){
+  const cls=bulkGuard();if(!cls)return;
+  askReason(`重算 · ${cls.length} 個群集`,"重新計算五個信號與總判斷（本地重算，不呼叫外部 API）。",
+    r=>{
+      const before=cls.map(c=>AUTH_VD[authStateOfCluster(c)].name).join("／");
+      const after=before;
+      authAudit("recompute_authenticity","批量重算 · "+cls.map(c=>c.id).join(" / "),before,after,r,"五個信號重算完成");
+      render();toast("重算完成（信號未變），已寫入審計");
+    },{preset:"批量例行重算，核對群集是否仍成立"});
+}
+function bulkKeep(){
+  const cls=bulkGuard();if(!cls)return;
+  askReason(`保留但標記 · ${cls.length} 個群集`,"仍計入辣度，但保留真假標記；草稿需顯示覆核提示。",
+    r=>{
+      const st=cls.map(c=>AUTH_VD[authStateOfCluster(c)].name).join("／");
+      cls.forEach(c=>{c.keepFlagged=true;c.excluded=false});
+      authAudit("keep_with_flag","批量保留標記 · "+cls.map(c=>c.id).join(" / "),st,st,r,"保留計入（標記）");
+      selMentions.clear();render();toast("已保留並標記（已寫審計）");
+    },{preset:"內容具體可查證，保留計入但需人工覆核"});
+}
+function pgInbox(){
+  const list=inboxList();
+  const segBtn=(k,v,t)=>`<button class="${inboxState[k]===v?"on":""}" onclick="inboxSet('${k}','${v}')">${t}</button>`;
+  return `<div class="card"><div class="hd" style="flex-wrap:wrap;gap:8px">
+    <span class="seg">${segBtn("plat","all","全部平台")}${segBtn("plat","OpenRice","OpenRice")}${segBtn("plat","Keeta","Keeta")}${segBtn("plat","Foodpanda","Foodpanda")}</span>
+    <span class="seg">${segBtn("sen","all","全部情緒")}${segBtn("sen","neg","負面")}${segBtn("sen","neu","中性")}${segBtn("sen","pos","正面")}</span>
+    <div class="spacer"></div>
+    <input type="text" id="inbox-q" value="${esc(inboxState.q)}" placeholder="搜尋門店 / 菜品 / 關鍵字…" style="width:200px"
+      onkeydown="if(event.key==='Enter'){inboxState.q=this.value.trim();render()}">
+    <button class="btn ghost sm" onclick="inboxState.q=document.getElementById('inbox-q').value.trim();render()">套用</button></div>
+  <div class="bd" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:9px 18px">
+    <b style="font-size:12.5px">真假篩選</b>
+    <span class="seg">${segBtn("auth","all","全部")}${segBtn("auth","real","只看真實")}${segBtn("auth","suspect","只看可疑")}${segBtn("auth","excluded","已排除")}</span>
+    <div class="spacer"></div>
+    <small style="color:var(--muted)">顯示 ${list.length} / ${M.length} 條 · 真假僅影響計入與覆核提示，不刪帖</small></div>
+  <table><thead><tr><th style="width:40px"></th><th>內容摘要</th><th>平台</th><th>門店</th><th>情緒</th><th>嚴重度</th><th>主題</th><th>真假</th><th>時間</th></tr></thead>
+  <tbody>${list.length?list.map(m=>{const ai=authOfMention(m);const dim=ai.st!=="authentic";return `<tr class="click" onclick="openCard(${m.id})" style="${dim?"opacity:.92":""}">
+    <td><input type="checkbox" ${selMentions.has(m.id)?"checked":""} onclick="event.stopPropagation();toggleSel(${m.id},this)"></td>
+    <td style="max-width:320px"><b>#${m.id}</b> <span style="${ai.st==="inauthentic"?"text-decoration:line-through;color:var(--muted)":""}">${m.text.slice(0,38)}…</span><br><small style="color:var(--muted)">${m.item} · ${m.lang}</small></td>
+    <td><span class="chip ${platChip(m.plat)}">${m.plat}</span></td><td>${m.store}</td>
+    <td><span class="chip ${senChip(m.sentiment)}">${{neg:"負面",pos:"正面",neu:"中性"}[m.sentiment]}</span></td>
+    <td><span class="chip ${sevChip(m.severity)}">${m.severity}</span></td><td>${m.topic}</td>
+    <td>${ai.st==="authentic"?authInline(null):authInline(ai.cl)}${ai.cl&&ai.st==="inauthentic"&&ai.cl.excluded?'<br><small style="color:var(--muted)">已排除</small>':""}</td>
+    <td><small style="color:var(--muted)">${m.time}</small></td></tr>`}).join("")
+    :`<tr><td colspan="9"><div class="empty">沒有符合篩選的意見 — 切回「全部」或調整真假／平台條件</div></td></tr>`}</tbody></table></div>
+  <div style="margin-top:14px" class="rowline" style="flex-wrap:wrap;gap:8px">
+    <span class="chip ${selMentions.size?"red":"gray"}">已選 ${selMentions.size} 條</span>
+    <button class="btn ghost sm" onclick="bulkExclude()">🚫 排除所選</button>
+    <button class="btn ghost sm" onclick="bulkReview()">✍️ 標記誤判</button>
+    <button class="btn ghost sm" onclick="bulkRecompute()">🔄 重算</button>
+    <button class="btn ghost sm" onclick="bulkKeep()">📌 保留但標記</button>
+    <button class="btn ghost sm" onclick="go('upload')">＋ 人工上傳意見</button>
+    <div class="spacer"></div><small style="color:var(--muted)">批量操作必填原因 · 寫入審計 →</small></div>`;
+}
+function fseg(b){[...b.parentNode.children].forEach(x=>x.classList.remove("on"));b.classList.add("on");toast("原型：篩選「"+b.textContent+"」已應用")}
+function openCard(id){
+  const m=M.find(x=>x.id===id);if(!m)return;
+  const ai=authOfMention(m),vd=AUTH_VD[ai.st];
+  const canDraft=ai.st!=="inauthentic";
+  $("#dw-title").textContent=`證據卡 #${m.id}`;
+  $("#dw-body").innerHTML=`
+   <div class="rowline" style="flex-wrap:wrap;gap:6px;margin-bottom:12px">
+     <span class="chip ${platChip(m.plat)}">${m.plat}</span><span class="chip ${senChip(m.sentiment)}">${{neg:"負面",pos:"正面",neu:"中性"}[m.sentiment]}情緒</span>
+     <span class="chip ${sevChip(m.severity)}">${m.severity}</span><span class="chip">${m.topic}</span>
+     <span class="chip">${"★".repeat(m.star)||"☆"}</span><span class="chip gray">${m.lang}</span>
+     <span class="chip ${vd.cls}">${vd.ic} ${vd.name}</span></div>
+   <div style="background:#FAF8F4;border-radius:10px;padding:14px 16px;font-size:13.5px">「${m.text}」</div>
+   <div style="font-size:11.5px;color:var(--muted);margin:8px 0 14px">${m.store} · ${m.item} · ${m.time} · 作者已雜湊去識別化</div>
+   <b style="font-size:13px">📎 證據連結（必附）</b>
+   <div style="margin:8px 0 14px;display:flex;flex-direction:column;gap:6px">
+     ${m.evidence.map(e=>`<a href="${e.u}" onclick="event.preventDefault();toast('原型：外部連結已禁用')" style="font-size:12.5px;color:#2B6CB0;text-decoration:none">🔗 ${e.t}</a>`).join("")}</div>
+   ${authPanel(m.cluster)}
+   <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+     <button class="btn primary" onclick="closeDrawer();go('drafts')" ${canDraft?"":"disabled title='⛔ 可能不真實：需先標記已覆核'"} data-mid="${m.id}" data-auth="${ai.st}">✨ 生成 AI 草稿</button>
+     <button class="btn ghost" onclick="toast('原型：已標記為 follow_up（本地狀態）')">標記跟進</button>
+     ${ROLE!=="guest"?`<button class="btn ghost" onclick="toast('原型：優先級調整面板（P0–P3）')">調整優先級</button>`:""}</div>
+   ${ai.st==="inauthentic"?'<div style="margin-top:12px;font-size:12px;color:var(--red)">⛔ 依守則：⛔ 可能不真實的帖不計入辣度，AI 拒絕生成草稿；如確需回覆，請先「保留但標記」並在策略卡記錄覆核。</div>':""}
+   ${ai.st==="suspicious"?'<div style="margin-top:12px;font-size:12px;color:var(--warn)">⚠ 此帖所屬群集為「可疑」：仍計入辣度，但草稿會顯示「此帖可疑，回覆前請覆核」（suspicious_priority）。</div>':""}`;
+  $("#drawer").classList.add("open");$("#mask").classList.add("on");
+}
+function closeDrawer(){$("#drawer").classList.remove("open");$("#mask").classList.remove("on")}
+
+/* ---- 草稿：語言／風格狀態與文字 ---- */
+function draftId(i){return "D-"+(4411+i)}
+function draftSev(i){return DRAFTS[i].sev||"S3"}
+function draftStyleOf(i){return draftStyleMap[i]||(draftSev(i)==="S3"?"short":"formal")}
+function draftKey(i){return i+"|"+draftLang+"|"+draftStyleOf(i)}
+function draftLangObj(){return DRAFT_LANGS.find(l=>l.code===draftLang)||DRAFT_LANGS[2]}
+function draftStyleObj(i){return DRAFT_STYLES.find(s=>s.code===draftStyleOf(i))}
+function draftText(i){
+  const d=DRAFTS[i];
+  if(d.fail||!d.evidence)return null;
+  const ed=draftEditMap[draftKey(i)];
+  if(typeof ed==="string"&&ed)return ed;
+  const shown=regenShown(i);
+  if(shown)return shown.text;
+  const row=d.i18n&&d.i18n[draftLang];
+  return row?(row[draftStyleOf(i)]||null):null;
+}
+/* ---- 重新生成：版本歷史（每個語言 × 長度各自一條版本線） ---- */
+function hmNow(){const t=new Date();return String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0")}
+function baseTextOf(i){const d=DRAFTS[i];const row=d.i18n&&d.i18n[draftLang];return row?(row[draftStyleOf(i)]||""):""}
+function regenHist(i){return regenMap[draftKey(i)]||[]}
+function regenVer(i){const h=regenHist(i);return h.length?h[h.length-1].v:1}
+function regenTotal(i){return regenHist(i).length||1}
+function regenShown(i){
+  const h=regenHist(i);if(!h.length)return null;
+  const want=regenView[draftKey(i)];
+  return (want&&h.find(x=>x.v===want))||h[h.length-1];
+}
+function regenPeek(i,v){regenView[draftKey(i)]=v;render();toast("預覽 v"+v+"（不會改動最新版）")}
+function regenToLatest(i){delete regenView[draftKey(i)];render();toast("已回到最新版本 v"+regenVer(i))}
+function regenUseAsBase(i){
+  const i2=i,shown=regenShown(i2);if(!shown)return;
+  const key=draftKey(i2),hist=regenHist(i2);
+  hist.push({v:hist.length+1,text:shown.text,t:hmNow(),from:shown.v});
+  delete regenView[key];delete draftAckMap[i2];
+  const gs=draftGuardState(i2);
+  draftAudit("adopt_version","草稿 "+draftId(i2),
+    draftDetail(i2,{from_version:"v"+shown.v,to_version:"v"+hist.length}),
+    gs.blocked?"r1":"r2");
+  render();toast("已把 v"+shown.v+" 收為最新版本 v"+hist.length+" · 已寫入審計");
+}
+/* ---- 草稿類型篩選：只有「真誠道歉 / 專業回應」 ---- */
+function draftFilterTone(k){
+  draftToneFilter=k;
+  if(k!=="all"){
+    const first=DRAFTS.findIndex(x=>(x.tone==="pro"?"pro":"sincere")===k);
+    if(first>=0)draftSel.d=first;
+  }
+  draftEditOpen=false;render();
+}
+function draftGuard(i){
+  const d=DRAFTS[i], text=draftText(i)||"";
+  const out=[];
+  if(d.fail||!d.evidence)out.push({id:"GR-07",level:"block",sev:"S1",name:"無證據不生成",
+    why:"草稿未引用任何證據卡或原文；依守則不得生成任何承諾。",fix:"請先補上證據卡連結，或改為人工撰寫。"});
+  (GUARD_RULES[draftLang]||[]).forEach(r=>{
+    if(text&&r.re.test(text))out.push({id:r.id,level:r.level,sev:r.sev,name:r.name,why:r.why,fix:r.fix});
+  });
+  const rec=M.find(x=>x.id===d.mid), ai=rec?authOfMention(rec):{st:"authentic",cl:null};
+  if(ai.st==="inauthentic")out.unshift({id:"GR-04",level:"block",sev:"S1",name:"引用可能不真實帖（inauthentic_cited）",
+    why:`來源屬群集 ${ai.cl.id}（⛔ 可能不真實），依守則不得直接回覆；需人工研究並標記「已覆核」。`,
+    fix:"先於真假分析完成覆核，再重新生成草稿。"});
+  else if(ai.st==="suspicious")out.unshift({id:"GR-05",level:"check",sev:"S2",name:"來源可疑（suspicious_priority）",
+    why:`所屬群集 ${ai.cl.id} 為 ⚠ 可疑：回覆前請覆核真假，並在審計記錄原因。`,
+    fix:"於真假分析頁完成覆核後勾選。"});
+  return out;
+}
+function draftGuardState(i){
+  const g=draftGuard(i);
+  return {g,blocked:g.some(x=>x.level==="block"),needsAck:g.some(x=>x.level==="check")};
+}
+function draftGuardLabel(gs){return gs.blocked?"⛔ 攔截":gs.needsAck?"☑️ 待勾選":"✅ 通過"}
+function draftGuardCode(gs){return gs.blocked?"blocked":gs.needsAck?"needs_ack":"pass"}
+function draftAudit(act,obj,detail,riskTag){
+  const now=new Date();
+  const t="今天 "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+  AUDIT.unshift({t,actor:ROLE==="guest"?"guest(沙盒)":ROLE,act,obj,risk:[riskTag||"r3",act],detail});
+  const na=$("#nav-audit");if(na)na.textContent=(+na.textContent)+1;
+  const nd=$("#nav-drafts");if(nd)nd.textContent=DRAFTS.filter(x=>x.status==="pending").length;
+}
+function draftDetail(i,extra){
+  const gs=draftGuardState(i);
+  const base={draft_id:draftId(i),language:draftLang,style:draftStyleOf(i),
+    guardrail_status:draftGuardCode(gs),evidence_count:DRAFTS[i].evidence||0};
+  return JSON.stringify(Object.assign(base,extra||{}));
+}
+
+/* ---- 切換語言／語體 ---- */
+function draftSetLang(code){
+  if(code===draftLang){toast("目前已係「"+draftLangObj().full+"」");return}
+  const i=draftSel.d,from=draftLang;
+  draftLang=code;delete draftAckMap[i];
+  const gs=draftGuardState(i);
+  draftAudit("switch_language","草稿 "+draftId(i),
+    draftDetail(i,{from_language:from,to_language:code,from_style:draftStyleOf(i),to_style:draftStyleOf(i)}),
+    gs.blocked?"r1":"r3");
+  render();
+  toast("語言／語體 → "+DRAFT_LANGS.find(l=>l.code===code).name+" · Guardrail 已重跑："+draftGuardLabel(gs));
+}
+/* ---- 切換風格 ---- */
+function draftSetStyle(code){
+  const i=draftSel.d,from=draftStyleOf(i);
+  if(code===from){toast("目前已是「"+(code==="short"?"簡短":"正式")+"」");return}
+  draftStyleMap[i]=code;delete draftAckMap[i];
+  const gs=draftGuardState(i);
+  draftAudit("switch_style","草稿 "+draftId(i),
+    draftDetail(i,{from_style:from,to_style:code,from_language:draftLang,to_language:draftLang}),
+    gs.blocked?"r1":"r3");
+  render();
+  toast("風格 → "+(code==="short"?"簡短":"正式")+" · Guardrail 已重跑："+draftGuardLabel(gs));
+}
+/* ---- 重新生成（可無限次：每次產生新版本並寫入審計） ---- */
+function draftRegen(){
+  const i=draftSel.d,d=DRAFTS[i],key=draftKey(i);
+  if(d.fail||!d.evidence){toast("無證據不生成：請先補上證據卡或改為人工撰寫");return}
+  const hist=regenMap[key]||(regenMap[key]=[{v:1,text:baseTextOf(i),t:hmNow(),base:true}]);
+  const n=hist.length;                       // 已生成 n 版 → 今次產生 v(n+1)
+  const txt=regenBuild(i,n);
+  if(!txt){toast("此語言／長度暫無法重新生成，請切換語言或人手編輯");return}
+  hist.push({v:n+1,text:txt,t:hmNow()});
+  delete regenView[key];delete draftEditMap[key];delete draftAckMap[i];
+  const gs=draftGuardState(i);
+  draftAudit("regenerate_draft","草稿 "+draftId(i),
+    draftDetail(i,{version:"v"+(n+1),attempt:n,tone:d.tone==="pro"?"pro":"sincere",
+      variant_index:(n-1),total_versions:n+1,superseded:"v"+n}),
+    gs.blocked?"r1":"r2");
+  render();
+  toast("已生成 v"+(n+1)+"（"+draftLangObj().name+" · "+draftStyleObj(i).name+"）· 可繼續重新生成 · Guardrail："+draftGuardLabel(gs));
+}
+/* ---- 儲存人工編輯（原因必填） ---- */
+function draftSaveEdit(){
+  const i=draftSel.d,d=DRAFTS[i];
+  const txt=($("#draft-edit")&&$("#draft-edit").value||"").trim();
+  const why=($("#draft-edit-reason")&&$("#draft-edit-reason").value||"").trim();
+  if(txt.length<10){toast("草稿內容太短（至少 10 個字元）");return}
+  if(why.length<2){toast("修改原因為必填（至少 2 個字）——所有草稿改動都要可追溯");return}
+  draftEditMap[draftKey(i)]=txt;delete draftAckMap[i];
+  const gs=draftGuardState(i);
+  draftAudit("edit_draft","草稿 "+draftId(i),
+    draftDetail(i,{reason:why,chars:txt.length,guardrail_status:draftGuardCode(gs)}),
+    gs.blocked?"r1":"r2");
+  draftEditOpen=false;render();
+  toast("已儲存修改（"+txt.length+" 字元）· 已寫入審計 · Guardrail："+draftGuardLabel(gs));
+}
+function draftAck(i,el){
+  draftAckMap[i]=!!(el&&el.checked);
+  if(draftAckMap[i])toast("已確認 Guardrail 勾選項 —— 批准按鈕已解鎖");
+  render();
+}
+
+function pgDrafts(){
+  const i=draftSel.d, d=DRAFTS[i];
+  const lang=draftLangObj(), style=draftStyleObj(i);
+  const text=draftText(i), gs=draftGuardState(i);
+  const acked=!!draftAckMap[i];
+  const ver=regenVer(i), total=regenTotal(i), shown=regenShown(i), previewing=!!(shown&&shown.v!==ver);
+  const canApprove=ROLE!=="guest"&&d.status==="pending"&&!gs.blocked&&!previewing&&(!gs.needsAck||acked);
+  const edited=typeof draftEditMap[draftKey(i)]==="string";
+  const ctx=draftContext?`<div class="card" style="margin-bottom:16px;border-color:#EFD9A8;background:#FFFBF0"><div class="bd" style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;padding:12px 16px">
+      <span class="spice l${draftContext.lvl}">${SPICE_LV[draftContext.lvl].ic} ${SPICE_LV[draftContext.lvl].name}</span>
+      <div style="flex:1;min-width:260px"><b style="font-size:13px">來自辣度個案 ${draftContext.cid} · ${draftContext.store} · ${draftContext.topic}</b>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px">顧客要求：${draftContext.heard}<br>
+          建議語氣：${draftContext.tone}　｜　<span style="color:var(--red)">不可說：${draftContext.avoid}</span>　｜　證據卡 ${draftContext.evId}　｜　平台：${draftContext.plats.join(" / ")}<br>
+          <b style="color:var(--warn)">建議跟進：${draftContext.fu||"—"}</b></div></div>
+      <button class="btn ghost sm" onclick="draftContext=null;go('radar')">← 返回辣度雷達</button>
+    </div></div>`:"";
+  const langBar=`<div class="dw-bar">
+      <div class="grp"><span class="k">語氣</span>
+        <span class="dw-chip tone">${d.toneIc} ${(d.toneName||"").split("（")[0]}</span></div>
+      <div class="grp"><span class="k">草稿語言</span>
+        <span class="seg">${DRAFT_LANGS.map(l=>`<button class="${l.code===draftLang?"on":""}" title="${l.full}" onclick="draftSetLang('${l.code}')">${l.name}</button>`).join("")}</span></div>
+      <div class="grp"><span class="k">長度</span>
+        <span class="seg">${DRAFT_STYLES.map(s=>`<button class="${s.code===draftStyleOf(i)?"on":""}" title="${s.desc}" onclick="draftSetStyle('${s.code}')">${s.name}</button>`).join("")}</span></div>
+      <div class="grp"><span class="k">版本</span>
+        <span class="dw-chip">v${ver}${total>1?" · 共 "+total+" 版":""}</span>
+        <button class="btn sm regen" onclick="draftRegen()" ${d.fail?"disabled title='無證據不生成'":""}>🔄 重新生成</button></div>
+      <div class="spacer"></div>
+      <span class="tag ai">AI 草稿，需人工批准</span>
+    </div>`;
+  const histBar=regenHist(i).length?`<div class="dw-hist">
+      <span class="k">版本歷史</span>
+      ${regenHist(i).map(h=>`<button class="vchip ${h.v===(shown?shown.v:ver)?"on":""} ${h.v!==ver?"old":""}" onclick="regenPeek(${i},${h.v})" title="${h.t} · ${h.text.length} 字元">v${h.v}</button>`).join("")}
+      <span class="hint">點擊可預覽任一版本 · 可無限次重新生成</span></div>
+      ${previewing?`<div class="dw-preview">👁 正在預覽 <b>v${shown.v}</b>（不是最新 v${ver}，預覽版<b>不可批准</b>）
+        <button class="btn ghost sm" onclick="regenToLatest(${i})">回到最新 v${ver}</button>
+        <button class="btn ghost sm" onclick="regenUseAsBase(${i})">以這版繼續生成</button></div>`:""}`
+    :`<div class="dw-hist"><span class="k">版本歷史</span><span class="hint">尚未重新生成 · 按「🔄 重新生成」可無限次產生新版本，每次寫入審計</span></div>`;
+  const body=text?`<div class="draft-body">${esc(text)}</div>`
+    :`<div class="dw-fail">⛔ ${DRAFT_FAIL_MSG[draftLang]||"此語言暫無法生成，請人工編輯。"}<br>
+        <small style="opacity:.85">原因：${d.note||"證據不足"}；系統不會在無證據下生成任何承諾。</small></div>`;
+  const refs=`<div class="dw-refs">🔗 引用證據（切換語言／風格不改變）：
+      ${d.refs.length?d.refs.map((r,k)=>k===0?`<span class="chip gray">${r}</span>`:`<a href="#" onclick="event.preventDefault();openCard(${d.mid})">${r}</a>`).join(""):'<span class="chip red">無證據</span>'}
+      <span class="chip ${gs.blocked?"red":gs.needsAck?"amber":"green"}">Guardrail ${draftGuardLabel(gs)}</span></div>`;
+  const lenRow=text?`<div class="dw-long">長度：<b>${text.length}</b> 字元　·　目標：${style.limit}　·　語言／語體：<b>${lang.full}</b>　·　語氣：<b>${d.tone==="pro"?"專業回應":"真誠道歉"}</b>　·　版本：<b>v${shown?shown.v:1}</b></div>`
+    :`<div class="dw-long">語言／語體：<b>${lang.full}</b>　·　長度：<b>${style.name}</b>　·　未生成內容</div>`;
+  const ackRow=gs.needsAck?`<div class="dw-ack"><input type="checkbox" ${acked?"checked":""} onchange="draftAck(${i},this)" style="margin-top:2px">
+      <div><b>S2 · 請勾選確認</b>：${gs.g.filter(g=>g.level==="check").map(g=>g.id+" "+g.name).join("、")} — 未勾選前不可批准。</div></div>`:"";
+  const toneOf=x=>x.tone==="pro"?"pro":"sincere";
+  const listIdx=DRAFTS.map((x,k)=>k).filter(k=>draftToneFilter==="all"||toneOf(DRAFTS[k])===draftToneFilter);
+  return `${ctx}<div class="grid" style="grid-template-columns:310px 1fr">
+  <div class="card" style="align-self:start"><div class="hd">草稿類型 <small>只有兩種：真誠道歉 / 專業回應</small></div><div class="bd" style="padding:8px">
+    <div class="tone-filter">
+      ${[["all","全部"],["sincere","🙏 真誠道歉"],["pro","🧑‍💼 專業回應"]].map(([k,n])=>`<button class="${draftToneFilter===k?"on":""}" onclick="draftFilterTone('${k}')">${n}</button>`).join("")}</div>
+    ${listIdx.map(k=>{const x=DRAFTS[k];return `<div onclick="draftSel.d=${k};draftSel.tone=0;draftEditOpen=false;render()" style="padding:11px 12px;border-radius:10px;cursor:pointer;${k===i?"background:#FDF1F3;outline:1.5px solid #F3C6CE":""};opacity:${x.status==="blocked"?.62:1}">
+      <div class="rowline"><span>${x.toneIc}</span><b style="font-size:13px">${toneOf(x)==="pro"?"專業回應":"真誠道歉"}</b><div class="spacer"></div>
+      ${x.status==="pending"?'<span class="chip amber">待審</span>':x.status==="approved"?'<span class="chip green">已批准</span>':x.status==="rejected"?'<span class="chip gray">已拒批</span>':'<span class="chip red">S1 攔截</span>'}</div>
+      <small style="color:var(--muted);font-size:11.5px">個案 #${x.mid} · ${x.evidence?"證據 "+x.evidence+" 條":"證據不足"} · ${x.sev}</small></div>`}).join("")||'<div class="empty" style="padding:14px;font-size:12.5px">此語氣暫無草稿</div>'}
+  </div></div>
+  <div class="card"><div class="hd">${d.toneIc} ${d.toneName} <small>個案 #${d.mid} · ${draftId(i)}</small>
+    <div class="spacer"></div><span class="chip gray">${d.sev}</span></div><div class="bd">
+    ${langBar}
+    ${d.status==="approved"?`<div class="approved-strip" style="margin-bottom:14px">✅ 已批准 — 可導出 CSV / PDF 或寫入「人工發布隊列」（系統永不自動發布）</div>`:""}
+    ${d.status==="rejected"?`<div style="background:#EEECE7;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px">⛔ 已拒批（S1 攔截個案無法進入審批流）</div>`:""}
+    ${body}
+    ${histBar}
+    ${refs}
+    ${lenRow}
+    ${edited?`<div class="dw-note">✏️ 此版本含人工編輯 — 請確認草稿仍引用正確證據（${d.refs.join("、")||"無"}）。</div>`:`<div class="dw-note" style="color:var(--muted);background:#FAF8F4;border-color:var(--line)">ℹ️ ${d.note}</div>`}
+    <b style="display:block;margin:16px 0 4px;font-size:13px">🛡️ Guardrail 檢查結果 <small style="color:var(--muted);font-weight:400">（每次切換語言／風格／重新生成都會重跑）</small></b>
+    <div class="guard">${gs.g.map(g=>`<div class="gitem ${g.level}"><span class="st">${{block:"⛔ 攔截",check:"☑️ 勾選",hint:"💡 提示"}[g.level]}</span>
+      <div><b><span class="rid">${g.id}</span><span class="sev">${g.sev}</span>${g.name}</b><br>${g.why}
+      ${g.fix?`<span class="fix">↳ ${g.fix}</span>`:""}</div></div>`).join("")||'<div class="gitem hint"><span class="st">✅</span><div><b>全部通過</b><br>未命中禁用詞與承諾邊界。</div></div>'}</div>
+    ${ackRow}
+    <div class="steps">
+      <div class="s done"><i>✓</i>證據卡</div><div class="ln done"></div>
+      <div class="s done"><i>✓</i>AI 草稿</div><div class="ln done"></div>
+      <div class="s ${gs.blocked?"":"done"}"><i>${gs.blocked?"✕":"✓"}</i>Guardrail</div><div class="ln ${d.status==="approved"?"done":""}"></div>
+      <div class="s ${d.status==="approved"?"done":"cur"}"><i>4</i>人類批准</div><div class="ln"></div>
+      <div class="s"><i>5</i>導出/隊列</div>
+    </div>
+    ${draftEditOpen?`<div class="dw-edit"><b style="font-size:12.5px">編輯草稿（${lang.name} · ${style.name}）</b>
+      <textarea id="draft-edit" rows="5" style="margin-top:8px">${esc(text||"")}</textarea>
+      <input id="draft-edit-reason" type="text" placeholder="修改原因（必填，至少 2 個字）">
+      <div class="row"><button class="btn primary sm" onclick="draftSaveEdit()">儲存修改（寫入審計）</button>
+        <button class="btn ghost sm" onclick="draftEditOpen=false;render()">取消</button>
+        <small style="color:var(--muted)">只改當前語言 × 風格版本；不影響其他版本</small></div></div>`:""}
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn primary" ${canApprove?"":"disabled"} onclick="approve()">✅ 批准</button>
+      <button class="btn ghost" ${ROLE==="guest"||d.status!=="pending"?"disabled":""} onclick="rejectDraft()">⛔ 拒批</button>
+      <button class="btn ghost" ${ROLE==="guest"?"disabled":""} onclick="draftEditOpen=!draftEditOpen;render()">✏️ ${draftEditOpen?"收起編輯":"編輯"}</button>
+      <button class="btn ghost" onclick="draftRegen()" ${d.fail?"disabled":""}>🔄 再生成一版（v${total+1}）</button>
+      <button class="btn ghost" ${ROLE!=="brand_manager"||d.status!=="approved"?"disabled":""} onclick="toast('原型：已寫入人工發布隊列 publish_queue（本地狀態）· 系統永不自動發布')">📤 寫入人工發布隊列</button>
+      <div class="spacer"></div>
+      ${ROLE==="guest"?'<small style="color:var(--muted);align-self:center">訪客不可批准 — 右下角「切換帳號」體驗完整流程</small>':""}</div>
+    <div style="margin-top:10px;font-size:11.5px;color:var(--muted)">🔒 人類審批後才可發布 — 批准只代表「可導出／可入隊列」，不存在自動發布路徑。　·　🔄 重新生成不限次數：每次產生新版本、寫入審計，舊版本可隨時預覽／收回。</div>
+  </div></div></div>`;
+}
+function approve(){
+  const i=draftSel.d,d=DRAFTS[i],gs=draftGuardState(i);
+  if(ROLE==="guest"){toast("訪客不可批准 — 請先切換為 brand_manager");return}
+  if(d.status!=="pending"){toast("此草稿已處理（"+d.status+"）");return}
+  if(gs.blocked){toast("Guardrail 攔截中：S1 個案不可批准，請先修正草稿內容");return}
+  if(gs.needsAck&&!draftAckMap[i]){toast("請先勾選確認 Guardrail 的 S2 勾選項");return}
+  askReason("批准草稿 · "+draftId(i),
+    `語言／語體：<b>${draftLangObj().name}</b>　風格：<b>${draftStyleObj(i).name}</b>　證據：${d.evidence} 條<br>
+     批准後只可導出 CSV/PDF 或寫入人工發布隊列，<b>系統永不自動發布</b>。請填寫批准理由（必填，將寫入審計）。`,
+    r=>{
+      d.status="approved";
+      draftAudit("approve","草稿 "+draftId(i),draftDetail(i,{reason:r,before:"pending",after:"approved"}),"r3");
+      render();toast("已批准 "+draftId(i)+" — 可導出／寫入人工發布隊列（不會自動發布）");
+    },{preset:"已核對證據與 Guardrail，同意對外回覆"});
+}
+function rejectDraft(){
+  const i=draftSel.d,d=DRAFTS[i];
+  if(ROLE==="guest"){toast("訪客不可拒批 — 請先切換為 brand_manager");return}
+  askReason("拒批草稿 · "+draftId(i),
+    `拒批後草稿不會導出、不會入隊列。<br>語言／語體：<b>${draftLangObj().name}</b>　風格：<b>${draftStyleObj(i).name}</b>。請填寫拒批理由（必填）。`,
+    r=>{
+      d.status="rejected";
+      draftAudit("reject_draft","草稿 "+draftId(i),draftDetail(i,{reason:r,before:"pending",after:"rejected"}),"r3");
+      render();toast("已拒批 "+draftId(i)+" — 理由已寫入審計");
+    },{preset:"語氣或內容不符合品牌守則，需重新生成"});
+}
+
+function pgSignals(){
+  const rows=AUTH_CLUSTERS.map(cl=>{
+    const st=authStates(cl),v=authStateOfCluster(cl);
+    return {cl,st,v,exp:authExplain(cl,st)};
+  });
+  const cnt={authentic:0,suspicious:0,inauthentic:0};rows.forEach(r=>cnt[r.v]++);
+  const posts={authentic:0,suspicious:0,inauthentic:0};rows.forEach(r=>posts[r.v]+=r.cl.mentions);
+  const excluded=AUTH_CLUSTERS.filter(c=>c.excluded).reduce((a,c)=>a+c.mentions,0);
+  const kept=AUTH_CLUSTERS.filter(c=>c.keepFlagged).length;
+  const needReview=rows.filter(r=>r.v!=="authentic"&&!r.cl.excluded).length;
+  const kpi=(ic,lab,num,sub,cls)=>`<div class="card kpi"><div class="em">${ic}</div>
+     <div class="lab">${lab}</div><div class="num" style="color:${cls||"var(--ink)"}">${num}</div>
+     <div class="trend" style="color:var(--muted);font-weight:400">${sub}</div></div>`;
+  const sigRule=(k,name,thr,q)=>{
+    const cells=thr.map((t,i)=>`<td><span class="chip ${["green","amber","red"][i]}">${["✅ 正常","⚠ 留意","⛔ 可疑"][i]}</span><br><small class="mono" style="color:var(--muted)">${t}</small></td>`).join("");
+    return `<tr><td><b>${name}</b><br><small style="color:var(--muted)">${q}</small></td>${cells}</tr>`;
+  };
+  return `<div class="grid" style="grid-template-columns:repeat(4,1fr)">
+    ${kpi("✅","真實群集",cnt.authentic,posts.authentic+" 條帖 · 正常計入","var(--ok)")}
+    ${kpi("⚠","可疑群集",cnt.suspicious,posts.suspicious+" 條帖 · 計入但標記","var(--warn)")}
+    ${kpi("⛔","可能不真實",cnt.inauthentic,posts.inauthentic+" 條帖 · 不計入辣度","var(--red)")}
+    ${kpi("🙋","需人工覆核",needReview,"已排除 "+excluded+" 條 · 保留標記 "+kept+" 個","")}
+  </div>
+
+  <div class="card" style="margin-top:16px"><div class="hd">🧩 相似群集 · 真假判斷
+      <small>平台僅 OpenRice / Foodpanda / Keeta · 點擊查看五信號與操作</small>
+      <div class="spacer"></div><span class="chip gray">不顯示權重與小數</span></div>
+    <table><thead><tr><th>群集</th><th>規模</th><th>平台</th><th>主題 / 門店</th><th>真假</th><th style="width:38%">一句話解釋</th><th></th></tr></thead>
+    <tbody>${rows.map(r=>{
+      const d=AUTH_VD[r.v];
+      const flag=r.cl.excluded?'<span class="chip red xline">已排除</span>':r.cl.keepFlagged?'<span class="chip amber">保留但標記</span>':"";
+      return `<tr class="click" onclick="authOpen('${r.cl.id}')">
+        <td><b>${r.cl.id}</b><br><small style="color:var(--muted)">${r.cl.label}</small></td>
+        <td><b>${r.cl.mentions}</b> 條<br><small style="color:var(--muted)">${r.cl.accounts} 個帳號</small></td>
+        <td>${Object.entries(r.cl.plats).map(([k,v])=>`<div><span class="chip ${platChip(k)}">${k}</span> <small>${v}</small></div>`).join("")}</td>
+        <td>${r.cl.topic}<br><small style="color:var(--muted)">${r.cl.stores}</small></td>
+        <td><span class="chip ${d.cls}">${d.ic} ${d.name}</span>${flag?"<br>"+flag:""}</td>
+        <td style="font-size:12px">${r.exp}</td>
+        <td><span class="btn ghost sm">查看 →</span></td></tr>`}).join("")}</tbody></table>
+  </div>
+
+  <div class="grid" style="grid-template-columns:1.15fr 1fr;margin-top:16px">
+    <div class="card"><div class="hd">五個信號 · 三個狀態 <small>每個信號只有正常 / 留意 / 可疑</small></div>
+      <div class="bd" style="padding-top:6px">
+        <table class="atbl"><thead><tr><th style="width:34%">信號</th><th>✅ 正常</th><th>⚠ 留意</th><th>⛔ 可疑</th></tr></thead><tbody>
+          ${sigRule("accounts","帳號數量",["≥ 5 個","3–4 個","≤ 2 個"],"相似帖來自多少個不同帳號")}
+          ${sigRule("span","時間集中",["≥ 3 天","1–3 天","≤ 24 小時"],"相似帖是否集中在短時間")}
+          ${sigRule("text","文本重複",["< 50%","50–80%","> 80%"],"相似帖文字是否几乎一樣")}
+          ${sigRule("cross","跨平台同步",["否","1 個平台","≥ 2 個平台"],"同一內容是否在多平台同時出現")}
+          ${sigRule("newacc","新帳號比例",["< 30%","30–60%","> 60%"],"發帖帳號是否多為新註冊／低活動")}
+        </tbody></table>
+        <div class="hintbox">第六個「正反比例」只作參考：同期只有負評、零正面 → 標「留意」，提示人工覆核，<b>不單獨觸發總判斷</b>。</div>
+      </div></div>
+    <div class="card"><div class="hd">總判斷規則 <small>只在 ≥3 項可疑時判「可能不真實」</small></div><div class="bd">
+      <div class="sig"><span class="ic g">✓</span><div><b>0–1 項可疑，且無「留意」</b><small>✅ 真實 · 正常計入辣度 · 正常生成策略與草稿</small></div></div>
+      <div class="sig"><span class="ic y">!</span><div><b>1–2 項可疑，或有 ≥2 項留意</b><small>⚠ 可疑 · 計入但標記 · 先人工覆核真假，再決定是否回應</small></div></div>
+      <div class="sig"><span class="ic r">✕</span><div><b>≥3 項可疑</b><small>⛔ 可能不真實 · 不計入辣度 · 只監測；如要回覆需標記「已覆核」</small></div></div>
+      <div class="hintbox" style="margin-top:10px"><b>一句話示例：</b>「12 條相似帖來自 2 個帳號（可疑）、集中 2 小時（可疑）、文本 90% 相同（可疑）→ 可能不真實。」</div>
+      <div class="hintbox">平台值只接受 OpenRice / Foodpanda / Keeta；<b>不建個人畫像</b>、不抓私信、<b>不因標籤自動刪帖</b>。</div>
+    </div></div>
+  </div>
+
+  <div class="card" style="margin-top:16px"><div class="hd">🚩 真假相關風險標記 <small>來自審計日誌</small>
+      <div class="spacer"></div><button class="btn ghost sm" onclick="go('audit')">打開審計日誌 →</button></div><div class="bd">
+    <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+      <div style="border:1px solid var(--line);border-radius:10px;padding:11px 13px">
+        <span class="risk r1">inauthentic_cited</span>
+        <div style="font-size:12.5px;margin-top:7px;font-weight:600">草稿引用 ⛔ 帖</div>
+        <small style="color:var(--muted)">草稿 #D-4413（個案 1204）引用了可能不真實來源，Guardrail 已標記，需人工研究後方可回覆。</small></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:11px 13px">
+        <span class="risk r2">suspicious_priority</span>
+        <div style="font-size:12.5px;margin-top:7px;font-weight:600">⚠ 帖進入 P0 / P1</div>
+        <small style="color:var(--muted)">旺角店排隊（C-79）為 ⚠ 可疑，仍計入辣度但已排入人工覆核清單，回覆前須覆核。</small></div>
+      <div style="border:1px solid var(--line);border-radius:10px;padding:11px 13px">
+        <span class="risk r2">bulk_exclude</span>
+        <div style="font-size:12.5px;margin-top:7px;font-weight:600">短時間大量排除</div>
+        <small style="color:var(--muted)">已排除 ${excluded} 條（${AUTH_CLUSTERS.filter(c=>c.excluded).length} 個群集）· 每次排除必填原因並寫入審計，超閾值需主管覆核。</small></div>
+    </div>
+    <div class="hintbox">真假標籤只影響「是否計入辣度」與「回應前的覆核提示」，<b>不會自動刪帖、不會自動發布</b>；所有操作保留原文與審計。</div>
+  </div></div>`;
+}
+/* ==================== 門店 / 時段熱點地圖（港島 · 九龍 · 新界） ==================== */
+const REGIONS={hongkong:["港島","#2B6CB0"],kowloon:["九龍","#E8552F"],new_territories:["新界","#1F8A4C"],unknown:["待補充區域","#8A8782"]};
+const HS_TOPICS=["排隊","服務","份量","衛生","價格","外賣包裝","食物品質"];
+const BUCKET_ZH={breakfast:"早市",lunch:"午市",afternoon:"下午茶",dinner:"晚市",late_night:"宵夜",unknown:"未知"};
+const HS_BUCKET_COLS=["早市","午市","下午茶","晚市","宵夜","未知"];
+const HS_STORES=[
+ {name:"銅鑼灣店",district:"灣仔區",region:"hongkong"},{name:"灣仔店",district:"中西區",region:"hongkong"},{name:"鰂魚涌店",district:"東區",region:"hongkong"},
+ {name:"旺角店",district:"油尖旺",region:"kowloon"},{name:"尖沙咀店",district:"油尖旺",region:"kowloon"},{name:"觀塘店",district:"觀塘",region:"kowloon"},
+ {name:"沙田店",district:"沙田",region:"new_territories"},{name:"荃灣店",district:"荃灣",region:"new_territories"},{name:"元朗店",district:"元朗",region:"new_territories"},
+ {name:"將軍澳店",district:"西貢",region:"unknown"}];
+const HS=[
+ {store:"旺角店",region:"kowloon",district:"油尖旺",topic:"排隊",bucket:"dinner",neg:12,s1:0,s2:3,s3:9,susp:1,trend:"up",
+  reps:[{plat:"OpenRice",text:"排隊 40 分鐘先有位，晚市全場爆滿，連吧檯都坐滿。",auth:"natural"},
+        {plat:"Foodpanda",text:"晚市等太耐，訂單遲咗 30 分鐘先送到。",auth:"suspect"}]},
+ {store:"旺角店",region:"kowloon",district:"油尖旺",topic:"衛生",bucket:"dinner",neg:5,s1:1,s2:2,s3:2,susp:0,trend:"flat",
+  reps:[{plat:"Keeta",text:"檯面有漬，餐具似冇洗淨（S1 食安線索，已同步辣度雷達 P0）。",auth:"natural"}]},
+ {store:"尖沙咀店",region:"kowloon",district:"油尖旺",topic:"服務",bucket:"lunch",neg:8,s1:0,s2:2,s3:6,susp:0,trend:"up",
+  reps:[{plat:"OpenRice",text:"午市樓面明顯唔夠人，加水要叫三次。",auth:"natural"}]},
+ {store:"觀塘店",region:"kowloon",district:"觀塘",topic:"外賣包裝",bucket:"dinner",neg:6,s1:0,s2:2,s3:4,susp:0,trend:"up",
+  reps:[{plat:"Foodpanda",text:"湯底漏晒入袋，成個外賣袋都係辣油。",auth:"natural"}]},
+ {store:"銅鑼灣店",region:"hongkong",district:"灣仔區",topic:"份量",bucket:"lunch",neg:7,s1:0,s2:1,s3:6,susp:0,trend:"down",
+  reps:[{plat:"OpenRice",text:"份量時多時少，今次明顯少咗。",auth:"natural"}]},
+ {store:"銅鑼灣店",region:"hongkong",district:"灣仔區",topic:"排隊",bucket:"dinner",neg:4,s1:0,s2:1,s3:3,susp:0,trend:"flat",
+  reps:[{plat:"OpenRice",text:"週末晚市等 30 分鐘，建議改用攞飛制。",auth:"natural"}]},
+ {store:"灣仔店",region:"hongkong",district:"中西區",topic:"價格",bucket:"lunch",neg:5,s1:0,s2:1,s3:4,susp:2,trend:"up",
+  reps:[{plat:"OpenRice",text:"加價之後性價比低咗，同區有更好選擇。",auth:"suspect"}]},
+ {store:"鰂魚涌店",region:"hongkong",district:"東區",topic:"服務",bucket:"afternoon",neg:3,s1:0,s2:0,s3:3,susp:0,trend:"flat",
+  reps:[{plat:"OpenRice",text:"下午茶時段收檯慢，叫埋單等咗十分鐘。",auth:"natural"}]},
+ {store:"沙田店",region:"new_territories",district:"沙田",topic:"排隊",bucket:"dinner",neg:7,s1:0,s2:2,s3:5,susp:0,trend:"up",
+  reps:[{plat:"OpenRice",text:"週末排隊嚴重，等咗 45 分鐘先入座。",auth:"natural"}]},
+ {store:"荃灣店",region:"new_territories",district:"荃灣",topic:"外賣包裝",bucket:"dinner",neg:5,s1:0,s2:1,s3:4,susp:0,trend:"up",
+  reps:[{plat:"Foodpanda",text:"湯同米線分開裝係好，但今次又漏汁。",auth:"natural"}]},
+ {store:"元朗店",region:"new_territories",district:"元朗",topic:"份量",bucket:"lunch",neg:4,s1:0,s2:1,s3:3,susp:0,trend:"flat",
+  reps:[{plat:"Keeta",text:"午餐份量正常，但配菜比以前少。",auth:"natural"}]},
+ {store:"將軍澳店",region:"unknown",district:"西貢",topic:"食物品質",bucket:"dinner",neg:3,s1:0,s2:1,s3:2,susp:0,trend:"flat",
+  reps:[{plat:"OpenRice",text:"新店出品未穩定，湯底時淡時濃。",auth:"natural"}]}];
+let hsState={region:"all",row:"region",col:"topic",brand:"tamjai",sel:null};
+const remedySet=new Set();
+let hsCurReps=[];
+const hsW=h=>h.s1*3+h.s2*2+h.s3;
+const hsFiltered=()=>HS.filter(h=>hsState.region==="all"||h.region===hsState.region);
+const TREND={up:["↑","down"],down:["↓","up"],flat:["→",""]};
+function hsCellColor(m){
+  if(m.s1>0)return["#C8102E","#fff"];
+  const w=m.s1*3+m.s2*2+m.s3;
+  if(w>=15)return["#E8552F","#fff"]; if(w>=10)return["#F2917A","#5A1A05"];
+  if(w>=5)return["#FBD3C8","#5A1A05"]; return["#F3EDE6","#5C5952"];
+}
+function hsRegion(r){hsState.region=r;hsState.sel=null;render()}
+function hsSel(rk,ck){hsState.sel=[rk,ck];render()}
+function hsRemedy(){if(!hsState.sel)return;remedySet.add(hsState.sel.join("|"));
+  toast("已加入補救清單（本地暫存 "+remedySet.size+" 項，匯出時合併）");render()}
+function hsExport(kind){
+  const rlab=hsState.region==="all"?"全部大區":REGIONS[hsState.region][0];
+  AUDIT.unshift({t:"今天 11:08",actor:ROLE==="guest"?"guest(沙盒)":ROLE,act:"export",obj:"hotspots 補救清單."+kind,
+    risk:["r3","匯出含 region 篩選條件"],
+    detail:"region="+hsState.region+"（"+rlab+"）· 矩陣="+hsState.row+"×"+hsState.col+" · 合併暫存 "+remedySet.size+" 項"});
+  $("#nav-audit").textContent=(+$("#nav-audit").textContent)+1;
+  toast("已導出 "+(kind==="csv"?"CSV（按大區分組排序）":"PDF（按大區分節）")+"，並寫入審計日誌 ✅");
+}
+function hsRep(i){const r=hsCurReps[i];if(!r)return;
+  $("#dw-title").textContent="證據卡 · "+r.store;
+  $("#dw-body").innerHTML=`<div class="rowline" style="flex-wrap:wrap;gap:6px;margin-bottom:12px">
+     <span class="chip ${platChip(r.plat)}">${r.plat}</span>
+     <span class="chip ${r.auth==="natural"?"green":"red"}">${r.auth==="natural"?"自然帖":"可疑帖"}</span>
+     <span class="chip">${r.topic}</span><span class="chip">${BUCKET_ZH[r.bucket]}</span>
+     <span class="chip gray">${REGIONS[r.region]?REGIONS[r.region][0]:"—"}</span></div>
+   <div style="background:#FAF8F4;border-radius:10px;padding:14px 16px;font-size:13.5px">「${r.text}」</div>
+   <div style="font-size:11.5px;color:var(--muted);margin:8px 0 14px">${r.store} · 作者已雜湊去識別化 · 原型數據</div>
+   <b style="font-size:13px">📎 證據連結（必附）</b>
+   <div style="margin:8px 0 16px"><a href="#" onclick="event.preventDefault();toast('原型：外部連結已禁用')" style="font-size:12.5px;color:#2B6CB0;text-decoration:none">🔗 原帖存檔 / 平台連結</a></div>
+   <div style="display:flex;gap:8px"><button class="btn primary" onclick="closeDrawer();go('drafts')">✨ 生成回覆草稿</button>
+   <button class="btn ghost" onclick="closeDrawer();spiceFromHotspot('${r.region}','${r.topic}','${r.store}')">🌶️ 查看辣度個案</button></div>`;
+  $("#drawer").classList.add("open");$("#mask").classList.add("on");
+}
+function pgHotspots(){
+  const bar=`<div class="card"><div class="hd" style="flex-wrap:wrap;gap:8px">
+      <b>🔥 熱點地圖</b>
+      <select onchange="hsState.brand=this.value;hsState.sel=null;render()">
+        <option value="tamjai" ${hsState.brand==="tamjai"?"selected":""}>品牌：譚仔</option>
+        <option value="samgor" ${hsState.brand==="samgor"?"selected":""}>品牌：三哥</option></select>
+      <select onchange="toast('原型：週次切換（W42 種子未生成，暫顯示 W43）')"><option>週：2026-W43</option><option>週：2026-W42</option></select>
+      <select onchange="toast('原型：平台篩選僅限 OpenRice / Foodpanda / Keeta（其他平台 API 一律 422）')"><option>平台：全部</option><option>OpenRice</option><option>Foodpanda</option><option>Keeta</option></select>
+      <select onchange="toast('原型：主題篩選（本地模擬）')"><option>主題：全部</option>${HS_TOPICS.map(t=>`<option>${t}</option>`).join("")}</select>
+      <select onchange="toast('原型：時段篩選（本地模擬）')"><option>時段：全部</option>${HS_BUCKET_COLS.map(t=>`<option>${t}</option>`).join("")}</select>
+      <div class="spacer"></div>
+      <button class="btn primary sm" onclick="hsExport('csv')">⬇️ 匯出補救清單${remedySet.size?"（含暫存 "+remedySet.size+" 項）":""}</button>
+      <button class="btn ghost sm" onclick="hsExport('pdf')">📄 PDF</button></div></div>`;
+  if(hsState.brand!=="tamjai")return bar+`<div class="card" style="margin-top:16px"><div class="bd empty" style="padding:64px">
+      🍂 <b>本週無顯著熱點</b><br><small>（原型：三哥 samgor 品牌種子未生成，切回「譚仔」查看演示數據）</small>
+      <div style="margin-top:14px"><button class="btn ghost sm" onclick="hsState.brand='tamjai';render()">← 返回譚仔</button></div></div></div>`;
+  const rows=hsState.region==="all"?HS_STORES:HS_STORES.filter(s=>s.region===hsState.region);
+  const dim=hsState.row,col=hsState.col;
+  let rowKeys=dim==="region"?["hongkong","kowloon","new_territories"]:dim==="store"?rows.map(s=>s.name):[...new Set(rows.map(s=>s.district))];
+  if(dim==="region"&&hsState.region==="all")rowKeys.push("unknown");
+  const colKeys=col==="topic"?HS_TOPICS:HS_BUCKET_COLS;
+  const cell=(rk,ck)=>HS.filter(h=>(dim==="region"?h.region===rk:dim==="store"?h.store===rk:h.district===rk)&&(col==="topic"?h.topic===ck:BUCKET_ZH[h.bucket]===ck));
+  const rowLabel=rk=>dim==="region"
+    ?`<span style="color:${REGIONS[rk][1]};font-weight:700">${REGIONS[rk][0]}</span>${rk==="unknown"?' <span class="chip gray">不進 Top3</span>':""}`
+    :dim==="store"?`${rk}${(HS_STORES.find(s=>s.name===rk)||{}).region==="unknown"?' <span class="chip gray">待補充區域</span>':""}`
+    :`${rk}${[...rows].some(s=>s.district===rk&&s.region==="unknown")?' <span class="chip gray">待補充</span>':""}`;
+  const top3=hsFiltered().filter(h=>h.region!=="unknown").sort((a,b)=>hsW(b)-hsW(a)).slice(0,3);
+  if(!hsState.sel||!cell(hsState.sel[0],hsState.sel[1]).length){
+    const t=top3[0]||hsFiltered()[0];
+    hsState.sel=t?[dim==="region"?t.region:dim==="store"?t.store:t.district,col==="topic"?t.topic:BUCKET_ZH[t.bucket]]:null;
+  }
+  const sel=hsState.sel,items=sel?cell(sel[0],sel[1]):[];
+  const m={neg:0,s1:0,s2:0,s3:0,susp:0};
+  items.forEach(h=>{["neg","s1","s2","s3","susp"].forEach(k=>m[k]+=h[k])});
+  hsCurReps=items.slice().sort((a,b)=>b.s1-a.s1||b.neg-a.neg).flatMap(h=>h.reps.map(r=>({...r,store:h.store,topic:h.topic,bucket:h.bucket,region:h.region}))).slice(0,5);
+  const upTrend=items.some(h=>h.trend==="up")?"up":items.some(h=>h.trend==="down")?"down":"flat";
+  const regSel=dim==="region"?sel[0]:(HS_STORES.find(s=>dim==="store"?s.name===sel[0]:s.district===sel[0])||{}).region||sel[0];
+  return bar+`
+  <div class="card" style="margin:16px 0"><div class="bd" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 18px">
+    <b style="font-size:12.5px;color:var(--muted)">大區：</b>
+    <span class="seg">
+      <button class="${hsState.region==="all"?"on":""}" onclick="hsRegion('all')">全部</button>
+      <button class="${hsState.region==="hongkong"?"on":""}" onclick="hsRegion('hongkong')">港島</button>
+      <button class="${hsState.region==="kowloon"?"on":""}" onclick="hsRegion('kowloon')">九龍</button>
+      <button class="${hsState.region==="new_territories"?"on":""}" onclick="hsRegion('new_territories')">新界</button>
+    </span>
+    <div class="spacer"></div>
+    <b style="font-size:12.5px;color:var(--muted)">矩陣：</b>
+    <span class="seg">
+      <button class="${dim==="region"?"on":""}" onclick="hsState.row='region';hsState.sel=null;render()">大區</button>
+      <button class="${dim==="store"?"on":""}" onclick="hsState.row='store';hsState.sel=null;render()">門店</button>
+      <button class="${dim==="district"?"on":""}" onclick="hsState.row='district';hsState.sel=null;render()">區</button>
+    </span>
+    <span class="seg">
+      <button class="${col==="topic"?"on":""}" onclick="hsState.col='topic';hsState.sel=null;render()">列：主題</button>
+      <button class="${col==="bucket"?"on":""}" onclick="hsState.col='bucket';hsState.sel=null;render()">列：時段</button>
+    </span></div></div>
+
+  <div class="card"><div class="hd">🏆 Top3 熱點 <small>${hsState.region==="all"?"全省級（不含待補充區域）":REGIONS[hsState.region][0]+"區·不含待補充區域"} · 加權分排序</small></div>
+   <div class="bd" style="display:flex;gap:12px;flex-wrap:wrap">
+   ${top3.length?top3.map((h,i)=>{const [ar,cls]=TREND[h.trend];const reg=REGIONS[h.region];
+     return `<div class="click" onclick="hsSel('${dim==="region"?h.region:dim==="store"?h.store:h.district}','${col==="topic"?h.topic:BUCKET_ZH[h.bucket]}')"
+        style="flex:1;min-width:210px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;background:${i===0?"#FDF1F3":"#fff"}">
+       <div class="rowline" style="gap:6px"><span class="chip" style="background:${reg[1]}1A;color:${reg[1]}">${reg[0]}</span>
+         <b style="font-size:13px">${h.store}</b><div class="spacer"></div><b class="${cls}" style="font-size:15px">${ar}</b></div>
+       <div style="font-size:13px;margin-top:4px"><b>${h.topic}</b> · ${BUCKET_ZH[h.bucket]}</div>
+       <div style="font-size:11.5px;color:var(--muted);margin-top:4px">負評 ${h.neg} · S1:${h.s1} S2:${h.s2} S3:${h.s3}${h.susp?" · 可疑 "+h.susp:""}</div></div>`}).join("")
+     :'<div class="empty" style="width:100%">本週無顯著熱點</div>'}
+   </div></div>
+
+  <div class="card" style="margin-top:16px"><div class="hd">🧭 熱力圖 · ${ {region:"行：大區",store:"行：門店",district:"行：區"}[dim] } × ${col==="topic"?"列：主題":"列：時段"} <small>數字＝負評數 · 點格子查看代表帖</small></div>
+   <div class="bd"><table style="border-collapse:separate;border-spacing:4px"><thead><tr><th style="width:132px">${{region:"大區",store:"門店",district:"區"}[dim]}</th>
+     ${colKeys.map(c=>`<th style="text-align:center;padding:4px 2px">${c}</th>`).join("")}</tr></thead><tbody>
+     ${rowKeys.map(rk=>`<tr><td style="border:none;padding:2px 4px;white-space:nowrap;font-size:12.5px">${rowLabel(rk)}</td>
+       ${colKeys.map(ck=>{const it=cell(rk,ck);
+         if(!it.length)return `<td style="border:none;padding:0"><div class="hcell" style="background:#F8F5F0;color:#CFC9BE" onclick="hsSel('${rk}','${ck}')">·</div></td>`;
+         const mm={s1:0,s2:0,s3:0,neg:0};it.forEach(h=>{mm.s1+=h.s1;mm.s2+=h.s2;mm.s3+=h.s3;mm.neg+=h.neg});
+         const [bg,fg]=hsCellColor(mm);const sp=it.reduce((a,h)=>a+h.susp,0);
+         const on=sel&&sel[0]===rk&&sel[1]===ck;
+         return `<td style="border:none;padding:0"><div class="hcell ${sp?"stripe":""}" style="background:${bg};color:${fg};${on?"outline:3px solid var(--red);outline-offset:-3px":""}"
+           onclick="hsSel('${rk}','${ck}')" title="${rk} × ${ck}：負評 ${mm.neg} · S1:${mm.s1} S2:${mm.s2} S3:${mm.s3}${sp?" · 可疑 "+sp:""}">${mm.neg}</div></td>`}).join("")}</tr>`).join("")}
+   </tbody></table>
+   <div class="rowline" style="margin-top:12px;font-size:11px;color:var(--muted);flex-wrap:wrap;gap:10px">
+     <span>嚴重度：</span><span><i style="width:12px;height:12px;background:#C8102E;display:inline-block;border-radius:3px"></i> 含 S1</span>
+     <span><i style="width:12px;height:12px;background:#E8552F;display:inline-block;border-radius:3px"></i> S2 主導</span>
+     <span><i style="width:12px;height:12px;background:#FBD3C8;display:inline-block;border-radius:3px"></i> S3</span>
+     <span><i style="width:12px;height:12px;background:#F3EDE6;display:inline-block;border-radius:3px"></i> 低</span>
+     <span><i class="hcell stripe" style="width:16px;height:12px;background:#F2917A;display:inline-block;border-radius:3px"></i> 含可疑帖</span>
+     <span>· 大區色僅輔助：<b style="color:#2B6CB0">港島</b> / <b style="color:#E8552F">九龍</b> / <b style="color:#1F8A4C">新界</b></span></div>
+   </div></div>
+
+  <div class="card" style="margin-top:16px"><div class="hd">📌 選中：${REGIONS[regSel]?REGIONS[regSel][0]:sel[0]}${dim!=="region"?" / "+sel[0]:""} / ${sel[1]}</div>
+   <div class="bd">
+     <div class="rowline" style="flex-wrap:wrap;gap:8px">
+       <span class="chip red">負評 ${m.neg}</span>
+       ${m.s1?`<span class="chip red">S1 × ${m.s1}</span>`:""}
+       <span class="chip amber">S2 × ${m.s2}</span><span class="chip gray">S3 × ${m.s3}</span>
+       ${m.susp?`<span class="chip amber">🛡️ 可疑 ${m.susp}（不計入負評）</span>`:""}
+       <span class="chip ${upTrend==="up"?"red":upTrend==="down"?"green":"gray"}">趨勢 ${TREND[upTrend][0]}</span>
+       <div class="spacer"></div><small style="color:var(--muted)">加權分 ${m.s1*3+m.s2*2+m.s3}</small></div>
+     <div style="margin:12px 0 6px;font-size:12.5px;color:var(--muted)">代表帖（最多 5 條 · 按嚴重度排序）</div>
+     ${hsCurReps.length?hsCurReps.map((r,i)=>`<div class="sig" style="cursor:pointer" onclick="hsRep(${i})">
+        <span class="chip ${platChip(r.plat)}">${r.plat}</span>
+        <div style="flex:1"><b style="font-weight:500">${r.text}</b><small>${r.store} · ${BUCKET_ZH[r.bucket]}</small></div>
+        <span class="chip ${r.auth==="natural"?"green":"red"}">${r.auth==="natural"?"自然":"可疑"}</span>
+        <span class="btn ghost sm">證據卡 →</span></div>`).join(""):'<div class="empty">此格暫無代表帖</div>'}
+     <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+       <button class="btn primary" onclick="go('drafts')">✨ 生成回覆草稿</button>
+       <button class="btn ghost" onclick="spiceFromHotspot('${regSel}','${sel[1]}','${sel[0]}')">🌶️ 查看辣度個案</button>
+       <button class="btn ghost" onclick="hsRemedy()">🧰 加入補救清單</button>
+       <div class="spacer"></div><small style="color:var(--muted);align-self:center">暫存 ${remedySet.size} 項 · 匯出時合併</small></div>
+   </div></div>`;
+}
+/* ==================== 辣度雷達 · 辣度個案（Listening → Strategy → Replying） ==================== */
+const SEV_W={S1:4,S2:3,S3:2};
+const SEV_DESC={S1:"食安／歧視／法律威脅",S2:"服務·價格·包裝等重複爭議",S3:"口味偏好·單次吐槽"};
+const TOPIC_URG={"衛生":1.5,"食物品質":1.4,"排隊":1.25,"服務":1.15,"外賣包裝":1.1,"價格":1.05,"份量":1.0,"辣度標示":0.9};
+/* 建議跟進時間：依辣度自動建議（首次回覆 / 完成跟進），hrs 為 SLA 剩餘小時 */
+const SPICE_FU={4:{first:"2 小時內",due:"24 小時內",cls:"red"},3:{first:"8 小時內",due:"48 小時內",cls:"amber"},
+  2:{first:"24 小時內",due:"72 小時內",cls:"gray"},1:{first:"下一個工作日",due:"每週回顧",cls:"gray"}};
+const SPICE_FU_LEFT={"SP-01":{txt:"剩 14h",hrs:14},"SP-02":{txt:"剩 6h",hrs:6},"SP-03":{txt:"剩 31h",hrs:31},
+  "SP-04":{txt:"剩 40h",hrs:40},"SP-05":{txt:"剩 2 天",hrs:48},"SP-06":{txt:"剩 1 天",hrs:24},
+  "SP-07":{txt:"剩 2 天",hrs:48},"SP-08":{txt:"剩 1 天",hrs:24},"SP-09":{txt:"—",hrs:9999},"SP-10":{txt:"—",hrs:9999}};
+const SPICE_LV={4:{ic:"🌶🌶🌶🌶",name:"特辣",cls:"l4"},3:{ic:"🌶🌶🌶",name:"大辣",cls:"l3"},2:{ic:"🌶🌶",name:"中辣",cls:"l2"},1:{ic:"🌶",name:"小辣",cls:"l1"}};
+const PLAT_COLOR={OpenRice:"#E8552F",Foodpanda:"#E4006B",Keeta:"#FFC72C"};
+const SPICE_CASES=[
+ {id:"SP-01",sev:"S1",topic:"衛生",store:"銅鑼灣店",district:"灣仔區",region:"hongkong",bucket:"dinner",sim:3,trend:"up",susp:1,evId:"EV-001",approved:1,cluster:"C-85",
+  plats:{OpenRice:2,Foodpanda:1,Keeta:0},demand:"解釋事件、跟進衛生問題、公開回應",
+  strategy:{stance:"承認問題 + 已轉交相關團隊跟進 + 法務覆核",no:"不承諾退款／賠償／保證不再發生",
+    plat:"OpenRice 公開回覆；Foodpanda 同步簡短回覆",tone:"正式、審慎，粵語口語比例低",
+    next:"公開回覆 + 轉營運 + 法務覆核",sla:"24 小時內進審批隊列"},
+  ms:[{mid:1201,plat:"OpenRice"},{mid:1206,plat:"OpenRice"}]},
+ {id:"SP-02",sev:"S1",topic:"衛生",store:"旺角店",district:"油尖旺",region:"kowloon",bucket:"dinner",sim:2,trend:"up",susp:0,evId:"EV-002",approved:0,cluster:"C-85",
+  plats:{Keeta:2,OpenRice:0,Foodpanda:0},demand:"跟進餐具與檯面衛生、要求門店回應",
+  strategy:{stance:"承認問題 + 門店即時清潔覆核 + 法務覆核",no:"不承諾退款／賠償／保證不再發生",
+    plat:"Keeta 訂單回覆；OpenRice 同步公開說明",tone:"正式、審慎，避免責任定性",
+    next:"公開回覆 + 轉營運 + 法務覆核",sla:"24 小時內進審批隊列"},
+  ms:[{mid:1214,plat:"Keeta"}]},
+ {id:"SP-03",sev:"S2",topic:"排隊",store:"旺角店",district:"油尖旺",region:"kowloon",bucket:"dinner",sim:5,trend:"up",susp:2,evId:"EV-003",approved:0,cluster:"C-79",
+  plats:{OpenRice:4,Keeta:1,Foodpanda:0},demand:"改善等候時間、提供輪候進度",
+  strategy:{stance:"承認等候過長 + 說明輪候機制改善",no:"不承諾具體等候分鐘數",
+    plat:"OpenRice 公開回覆；Keeta 訂單回覆",tone:"誠懇、具體，避免官腔",
+    next:"公開回覆 + 門店排班檢視",sla:"48 小時內進審批隊列"},
+  ms:[{mid:1213,plat:"OpenRice"}]},
+ {id:"SP-04",sev:"S2",topic:"排隊",store:"沙田店",district:"沙田",region:"new_territories",bucket:"dinner",sim:4,trend:"up",susp:0,evId:"EV-004",approved:0,cluster:"C-79",
+  plats:{OpenRice:3,Keeta:1,Foodpanda:0},demand:"要求顯示輪候進度、改善週末安排",
+  strategy:{stance:"承認問題 + 說明週末分流安排",no:"不承諾即時增派人手",
+    plat:"OpenRice 公開回覆",tone:"誠懇、務實",
+    next:"公開回覆 + 週末排班檢視",sla:"48 小時內進審批隊列"},
+  ms:[{mid:1207,plat:"OpenRice"}]},
+ {id:"SP-05",sev:"S2",topic:"價格",store:"灣仔店",district:"中西區",region:"hongkong",bucket:"lunch",sim:6,trend:"up",susp:2,evId:"EV-005",approved:0,cluster:"C-77",
+  plats:{OpenRice:5,Foodpanda:1,Keeta:0},demand:"要求說明加價原因、比較份量與價格",
+  strategy:{stance:"說明調整原因 + 強調份量標準，不與競品比較",no:"不評論競品、不承諾回贈",
+    plat:"OpenRice 公開回覆；Foodpanda 不回覆單一比較帖",tone:"中性、資料導向",
+    next:"公開回覆 + 價格說明素材",sla:"每週回顧"},
+  ms:[{mid:1209,plat:"OpenRice"}]},
+ {id:"SP-06",sev:"S2",topic:"服務",store:"尖沙咀店",district:"油尖旺",region:"kowloon",bucket:"lunch",sim:3,trend:"up",susp:0,evId:"EV-006",approved:0,cluster:"C-88",
+  plats:{OpenRice:3,Foodpanda:1,Keeta:0},demand:"要求改善午市樓面人手與回應速度",
+  strategy:{stance:"承認人手緊張 + 說明午市安排",no:"不承諾特定等候時間",
+    plat:"OpenRice 公開回覆",tone:"誠懇、簡短",
+    next:"公開回覆 + 午市排班檢視",sla:"48 小時內進審批隊列"},
+  ms:[{mid:1208,plat:"OpenRice"}]},
+ {id:"SP-07",sev:"S2",topic:"份量",store:"銅鑼灣店",district:"灣仔區",region:"hongkong",bucket:"lunch",sim:4,trend:"down",susp:0,evId:"EV-007",approved:0,
+  plats:{OpenRice:4,Foodpanda:0,Keeta:0},demand:"要求回覆份量標準、說明差異原因",
+  strategy:{stance:"說明標準份量 + 邀請提供單據覆核",no:"不承諾補送或退款",
+    plat:"OpenRice 公開回覆",tone:"中性、具體",
+    next:"公開回覆 + 出品標準抽查",sla:"每週回顧"},
+  ms:[{mid:1210,plat:"OpenRice"}]},
+ {id:"SP-08",sev:"S2",topic:"外賣包裝",store:"荃灣店",district:"荃灣",region:"new_territories",bucket:"dinner",sim:3,trend:"up",susp:0,evId:"EV-008",approved:0,cluster:"C-81",
+  plats:{Foodpanda:2,Keeta:1,OpenRice:0},demand:"要求改善包裝密封、避免漏汁",
+  strategy:{stance:"承認包裝問題 + 說明密封膜試點",no:"不承諾全線即時更換",
+    plat:"Foodpanda 訂單回覆；Keeta 同步",tone:"誠懇、務實",
+    next:"公開回覆 + 包裝試點",sla:"48 小時內進審批隊列"},
+  ms:[{mid:1211,plat:"Foodpanda"}]},
+ {id:"SP-09",sev:"S3",topic:"辣度標示",store:"觀塘店",district:"觀塘",region:"kowloon",bucket:"afternoon",sim:2,trend:"flat",susp:0,evId:"EV-009",approved:0,
+  plats:{Keeta:2,OpenRice:0,Foodpanda:0},demand:"要求辣度標準化、標示更清晰",
+  strategy:{stance:"感謝建議 + 說明辣度卡改版計劃",no:"不承諾個別門店即時調整",
+    plat:"Keeta 訂單回覆",tone:"輕鬆、親切",
+    next:"公開回覆 + 產品標準化",sla:"每週回顧"},
+  ms:[{mid:1205,plat:"Keeta"}]},
+ {id:"SP-10",sev:"S3",topic:"服務",store:"鰂魚涌店",district:"東區",region:"hongkong",bucket:"afternoon",sim:2,trend:"flat",susp:0,evId:"EV-010",approved:0,
+  plats:{OpenRice:2,Foodpanda:0,Keeta:0},demand:"要求改善下午茶時段收檯與結賬效率",
+  strategy:{stance:"感謝反映 + 說明下午茶時段安排",no:"不承諾具體等候時間",
+    plat:"OpenRice 公開回覆",tone:"親切、簡短",
+    next:"公開回覆 + 門店提醒",sla:"每週回顧"},
+  ms:[{mid:1212,plat:"OpenRice"}]}];
+
+let spiceState={brand:"tamjai",region:"all",plat:"all",topic:"all",time:"week",realOnly:false,view:"topic",openLow:false,showCalc:false};
+const seenSpice=new Set();
+let draftContext=null;
+
+function spiceEffSim(c){return Math.max(0,c.sim-(spiceState.realOnly?c.susp:0))}
+function spicePlatsOf(c){if(spiceState.plat==="all")return c.plats;const v=c.plats[spiceState.plat]||0;return v?{[spiceState.plat]:v}:{}}
+function spiceEv(c,sim){
+  const pn=Object.values(spicePlatsOf(c)).filter(v=>v>0).length||1;
+  const s=sim==null?spiceEffSim(c):sim;
+  return +(0.9+Math.min(s,6)*0.32+(pn-1)*0.45).toFixed(2);
+}
+function spiceScore(c,sim){return +((SEV_W[c.sev]||2)*(TOPIC_URG[c.topic]||1)*spiceEv(c,sim)).toFixed(1)}
+function spiceLvl(c,sim){if(c.sev==="S1")return 4;const s=spiceScore(c,sim);return s>=12?4:s>=9?3:s>=6?2:1}
+function spiceFormula(c){
+  return `嚴重度 ${SEV_W[c.sev]||2}（${c.sev}）× 主題緊迫性 ${TOPIC_URG[c.topic]||1}（${c.topic}）× 證據強度 ${spiceEv(c)}（相似帖 ${spiceEffSim(c)} · ${Object.values(spicePlatsOf(c)).filter(v=>v>0).length||1} 平台）= ${spiceScore(c)}`;
+}
+function spiceFu(c){
+  const lvl=spiceLvl(c),p=SPICE_FU[lvl]||SPICE_FU[1];
+  const left=SPICE_FU_LEFT[c.parent||c.id]||{txt:"—",hrs:9999};
+  return {...p,...left};
+}
+function spiceFiltered(){
+  if(spiceState.brand!=="tamjai")return [];
+  return SPICE_CASES.filter(c=>{
+    const info=authCaseInfo(c);
+    if(!info.counted)return false;                             /* ⛔ 不計入辣度 */
+    if(spiceState.realOnly&&info.st!=="authentic")return false; /* 只看真實帖 */
+    return (spiceState.region==="all"||c.region===spiceState.region)
+      &&(spiceState.topic==="all"||c.topic===spiceState.topic)
+      &&(spiceState.plat==="all"||(c.plats[spiceState.plat]||0)>0);
+  });
+}
+/* 監測中：⛔ 可能不真實，不計入辣度，但仍可查看與覆核 */
+function spiceMonitoring(){
+  if(spiceState.brand!=="tamjai")return [];
+  return SPICE_CASES.filter(c=>!authCaseInfo(c).counted);
+}
+function spiceViewList(){
+  const base=spiceFiltered();
+  if(spiceState.view!=="post")return base;
+  const out=[];
+  base.forEach(c=>c.ms.forEach(m=>{
+    const rec=M.find(x=>x.id===m.mid)||{};
+    const ai=authOfMention(rec);
+    if(spiceState.realOnly&&ai.st!=="authentic")return;
+    out.push({...c,id:"P-"+m.mid,parent:c.id,post:true,mid:m.mid,plat:m.plat,ms:[m],sim:1,susp:0,plats:{[m.plat]:1},demand:c.demand});
+  }));
+  return out;
+}
+function spiceBadge(lvl,c){
+  const l=SPICE_LV[lvl];
+  const tip=c?`${l.name}｜嚴重度 ${c.sev}（${SEV_DESC[c.sev]}）｜主題 ${c.topic}（緊迫性 ×${TOPIC_URG[c.topic]||1}）｜真假：${c.susp?"含可疑帖 "+c.susp+" 條":"自然帖"}｜相似帖 ${c.sim}｜平台 ${Object.keys(c.plats).filter(k=>c.plats[k]>0).join(" / ")}｜建議跟進：${spiceFu(c).first}首次回覆／${spiceFu(c).due}完成｜辣度 = 嚴重度 × 主題緊迫性 × 證據強度（已排除 likely_inauthentic）`
+    :`${l.name} · 辣度 = 嚴重度 × 主題緊迫性 × 證據強度`;
+  return `<span class="spice ${l.cls}" title="${tip}">${l.ic} ${l.name}</span>`;
+}
+function spicePlatDist(c){
+  const p=spicePlatsOf(c),tot=Object.values(p).reduce((a,b)=>a+b,0)||1;
+  const entries=Object.entries(p).filter(([,v])=>v>0);
+  return `<span class="plbar" title="${entries.map(e=>e[0]+" "+e[1]).join(" / ")}">${entries.map(([k,v])=>`<i style="width:${v/tot*100}%;background:${PLAT_COLOR[k]}"></i>`).join("")}</span>
+    <small style="color:var(--muted)">${entries.map(([k,v])=>`${k} ${v}`).join(" / ")}</small>`;
+}
+function spiceAudit(act,obj,detail){
+  const m=String(10+Math.floor(Math.random()*45)).padStart(2,"0");
+  AUDIT.unshift({t:"今天 11:"+m,actor:ROLE==="guest"?"guest(沙盒)":ROLE,act,obj,risk:["r3","原型：本地狀態"],detail});
+  const el=$("#nav-audit");if(el)el.textContent=(+el.textContent)+1;
+}
+function spiceSet(k,v){spiceState[k]=v;render()}
+function spiceRealOnly(v){
+  if(spiceState.realOnly===v){toast(v?"目前已是「只看真實帖」":"目前顯示全部帖");return}
+  authToggleFilter(v,"辣度雷達");
+}
+function spiceSeen(cid){
+  const was=seenSpice.has(cid);seenSpice.add(cid);
+  spiceAudit("mark_seen","辣度個案 "+cid,"seen=true（本地狀態）");
+  toast(was?"已看過 "+cid:"已標記已看 · 已寫入審計日誌 ✅");render();
+}
+function spiceCard(c){
+  const lvl=spiceLvl(c),seen=seenSpice.has(c.id),reg=REGIONS[c.region],post=!!c.post,pid=c.parent||c.id;
+  const plats=spicePlatsOf(c),fu=spiceFu(c);
+  const mainPlat=post?c.plat:((Object.entries(plats).sort((a,b)=>b[1]-a[1])[0]||["—"])[0]);
+  const [ar,tcls]=TREND[c.trend||"flat"];
+  const evidence=post?[{mid:c.mid,plat:c.plat}]:c.ms;
+  const ai=authCaseInfo(c);
+  const lvlRaw=spiceLvl(c,c.sim);
+  const drop=spiceState.realOnly&&c.susp>0&&lvlRaw!==lvl?`${SPICE_LV[lvlRaw].name} → ${SPICE_LV[lvl].name}`:"";
+  const vd=AUTH_VD[ai.st];
+  return `<div class="sx ${seen?"seen":""}">
+   <div class="sx-hd">
+     ${spiceBadge(lvl,c)}
+     <span class="chip ${sevChip(c.sev)}" title="嚴重度 ${c.sev}：${SEV_DESC[c.sev]}">${c.sev}</span>
+     <b>${c.topic}</b>
+     <span class="chip" style="background:${reg[1]}1A;color:${reg[1]}">${reg[0]}</span>
+     <b>${c.store}</b>
+     <span class="chip ${platChip(mainPlat)}">${mainPlat}</span>
+     <span class="chip">${BUCKET_ZH[c.bucket]}</span>
+     ${post?`<span class="chip gray">單帖 #${c.mid}</span>`:""}
+     <div class="spacer"></div>
+     <span class="chip ${fu.cls}" title="依辣度建議：${fu.first}首次回覆 · ${fu.due}完成跟進">⏱ ${fu.txt}</span>
+     <b class="${tcls}" style="font-size:15px" title="週環比">${ar}</b>
+     ${seen?'<span class="chip green">已看</span>':c.approved?'<span class="chip green">已批准</span>':'<span class="chip amber">待批准</span>'}
+   </div>
+   <div class="sx-bd">
+     <div class="rowline" style="flex-wrap:wrap;gap:8px;font-size:11.5px;color:var(--muted)">
+       ${ai.cl?`<span class="chip ${vd.cls}" style="cursor:pointer" onclick="authOpen('${ai.cl.id}')" title="${esc(authExplain(ai.cl,authStates(ai.cl)))}">真假 ${vd.ic} ${vd.name}</span>
+         <button class="btn subtle sm" onclick="authOpen('${ai.cl.id}')">查看信號</button>`
+        :`<span class="chip green" title="未命中相似群集：單帖、無重複文本">真假 ✅ 真實</span>`}
+       ${drop?`<span class="chip amber" title="切換只看真實帖後重算">排除可疑帖後：${drop}</span>`:""}
+       <span>相似帖 <b style="color:var(--ink)">${spiceEffSim(c)}</b></span>
+       <span>平台分佈</span>${spicePlatDist(c)}
+       <div class="spacer"></div>
+       <small title="${spiceFormula(c)}">辣度分 <b style="color:var(--ink);font-size:12.5px">${spiceScore(c)}</b> ＝ 嚴重度 ${SEV_W[c.sev]||2} × 緊迫性 ${TOPIC_URG[c.topic]||1} × 證據 ${spiceEv(c)}</small>
+     </div>
+     <div class="sx-row"><span class="sx-k">顧客在要求什麼</span>
+       <div><b>${c.demand}</b><br><small style="color:var(--muted)">由 ${evidence.length} 條原文歸納（Listening）</small></div></div>
+     <div class="sx-row"><span class="sx-k">證據</span>
+       <div class="rowline" style="flex-wrap:wrap;gap:8px">
+         ${evidence.map((m,i)=>`<a href="#" onclick="event.preventDefault();openCard(${m.mid})" style="font-size:12px;color:#2B6CB0;text-decoration:none">🔗 原文 ${i+1} · ${m.plat}</a>`).join("")}
+         <span class="chip gray">證據卡 ${c.evId}</span></div></div>
+     <div class="sx-row"><span class="sx-k">建議跟進時間</span>
+       <div class="rowline" style="flex-wrap:wrap;gap:8px">
+         <span class="chip ${fu.cls}">⏱ 首次回覆 ${fu.first}</span>
+         <span class="chip ${fu.cls}">✅ 完成跟進 ${fu.due}</span>
+         <span class="chip gray">SLA ${fu.txt}</span>
+         <small style="color:var(--muted)">依辣度自動建議，需人工批准後執行</small></div></div>
+     <div class="sx-row"><span class="sx-k">建議回應策略</span>
+       <div style="flex:1;min-width:0"><div class="strat">
+         <div><span class="k">立場</span><b>${c.strategy.stance}</b></div>
+         <div><span class="k">平台</span>${c.strategy.plat}　<span class="k">語氣</span>${c.strategy.tone}</div>
+         <div><span class="k">不可說</span><b style="color:var(--red)">${c.strategy.no}</b></div>
+         <div><span class="k">下一步</span>${c.strategy.next} · SLA ${c.strategy.sla}</div>
+       </div></div></div>
+   </div>
+   <div class="sx-ft">
+     <button class="btn ghost sm" onclick="spiceStrategy('${pid}')">📋 看策略卡</button>
+     <button class="btn primary sm" onclick="spiceDraft('${pid}')">✨ 生成草稿</button>
+     <button class="btn ghost sm" onclick="openCard(${evidence[0].mid})">📇 查看證據卡</button>
+     <button class="btn ghost sm" onclick="spiceJump('${pid}')">🔥 查看熱點地圖</button>
+     ${post?"":`<button class="btn ghost sm" onclick="spiceDrill('${c.id}')">↳ 下鑽單帖</button>`}
+     <button class="btn ghost sm" onclick="spiceSeen('${c.id}')">${seen?"✓ 已標記":"☑️ 標記已看"}</button>
+     <div class="spacer"></div><small style="color:var(--muted)">AI 只生成草稿，需人工批准後才導出</small>
+   </div></div>`;
+}
+function spiceRadarMini(){
+  const cx=104,cy=104,r=74,n=RADAR.topics.length;
+  const pt=(i,val)=>{const a=-Math.PI/2+i*2*Math.PI/n,rr=r*val/100;return [cx+rr*Math.cos(a),cy+rr*Math.sin(a)]};
+  const poly=v=>RADAR.topics.map((_,i)=>pt(i,v[i]).join(",")).join(" ");
+  return `<svg viewBox="0 0 208 212" style="width:196px;height:200px">
+    ${[50,100].map(g=>`<polygon points="${RADAR.topics.map((_,i)=>pt(i,g).join(",")).join(" ")}" fill="none" stroke="#EDE9E1"/>`).join("")}
+    ${RADAR.topics.map((t,i)=>{const [x,y]=pt(i,116);return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#EDE9E1"/><text x="${x}" y="${y}" font-size="7.5" text-anchor="middle" fill="#8A8782" dy="3">${t}</text>`}).join("")}
+    <polygon points="${poly(RADAR.prev)}" fill="rgba(138,135,130,.12)" stroke="#B7B2A8" stroke-dasharray="3 3"/>
+    <polygon points="${poly(RADAR.now)}" fill="rgba(200,16,46,.14)" stroke="#C8102E" stroke-width="2"/>
+  </svg>`;
+}
+function spiceSignals(cid){
+  const c=SPICE_CASES.find(x=>x.id===cid);if(!c)return;
+  if(c.cluster&&authCluster(c.cluster)){authOpen(c.cluster);return}
+  $("#dw-title").textContent="真假分析 · "+c.store+" · "+c.topic;
+  $("#dw-body").innerHTML=`
+    <div class="rowline" style="gap:6px;flex-wrap:wrap;margin-bottom:6px">
+      ${spiceBadge(spiceLvl(c),c)}<span class="chip ${sevChip(c.sev)}">${c.sev}</span><span class="chip">${c.topic}</span>
+      <span class="chip green">✅ 真實</span></div>
+    ${authPanel(null)}
+    <div style="display:flex;gap:8px;margin-top:14px"><button class="btn ghost" onclick="closeDrawer()">關閉</button></div>`;
+  $("#drawer").classList.add("open");$("#mask").classList.add("on");
+}
+function spiceStrategy(cid){
+  const c=SPICE_CASES.find(x=>x.id===cid);if(!c)return;
+  const lvl=spiceLvl(c),l=SPICE_LV[lvl],fu=spiceFu(c);
+  const demands=c.demand.split("、");
+  const evs=c.ms.map((m,i)=>{const rec=M.find(x=>x.id===m.mid)||{text:"（原文存檔）"};return `<div class="sig" style="cursor:pointer" onclick="openCard(${m.mid})">
+      <span class="chip ${platChip(m.plat)}">${m.plat}</span>
+      <div style="flex:1"><b style="font-weight:500">${rec.text}</b><small>原文 ${i+1} · 證據卡 ${c.evId} · ${c.store}</small></div>
+      <span class="btn ghost sm">打開 →</span></div>`}).join("");
+  $("#dw-title").textContent=`策略卡 · ${l.name} · ${c.topic} · ${c.store}`;
+  $("#dw-body").innerHTML=`
+    <div class="rowline" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">
+      ${spiceBadge(lvl,c)}<span class="chip ${sevChip(c.sev)}">${c.sev}</span><span class="chip">${c.topic}</span>
+      <span class="chip" style="background:${REGIONS[c.region][1]}1A;color:${REGIONS[c.region][1]}">${REGIONS[c.region][0]}</span>
+      <span class="chip">${c.store}</span><span class="chip">${BUCKET_ZH[c.bucket]}</span><span class="chip gray">${c.evId}</span>
+      <span class="chip ${fu.cls}">⏱ 首次回覆 ${fu.first} · 完成 ${fu.due}</span></div>
+    <div class="sx-sec">1 · 顧客在要求什麼（證據）</div>
+    <div style="font-size:12.8px">${demands.map((d,i)=>`<div style="padding:3px 0">· ${d}（原文 ${(i%c.ms.length)+1}）</div>`).join("")}</div>
+    <div class="sx-sec">2 · 建議立場</div>
+    <div style="font-size:12.8px">· <b>${c.strategy.stance}</b><br>· <span style="color:var(--red)">不承諾</span>：${c.strategy.no}</div>
+    <div class="sx-sec">3 · 建議平台與語氣</div>
+    <div style="font-size:12.8px">· ${c.strategy.plat}<br>· 語氣：${c.strategy.tone}<br>· 平台僅限 OpenRice / Foodpanda / Keeta</div>
+    <div class="sx-sec">4 · 建議下一步與跟進時間</div>
+    <div style="font-size:12.8px">· ${c.strategy.next}<br>· SLA：${c.strategy.sla}<br>
+      · <b>建議首次回覆：${fu.first}</b>（依辣度 ${l.name} 建議）<br>
+      · <b>建議完成跟進：${fu.due}</b>　<span class="chip ${fu.cls}" style="margin-left:4px">SLA ${fu.txt}</span></div>
+    <div class="sx-sec">5 · 引用證據</div>${evs}
+    <div style="background:#FAF8F4;border:1px dashed #DCD6CA;border-radius:10px;padding:10px 12px;font-size:11.5px;color:var(--muted);margin-top:4px">
+      無證據不生成策略；本策略卡由 ${c.ms.length} 條原文與證據卡 ${c.evId} 生成，操作已寫入審計日誌。</div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn primary" onclick="closeDrawer();spiceDraft('${c.id}')">✨ 生成草稿</button>
+      <button class="btn ghost" onclick="spiceAudit('approve_strategy','策略卡 ${c.id}','策略已審（本地狀態）');toast('已標記策略已審，寫入審計日誌 ✅')">✓ 標記策略已審</button>
+      <button class="btn ghost" onclick="spiceAudit('export','策略卡 ${c.id}','export=pdf · region=${c.region}');toast('已導出策略卡 PDF（本地模擬），並寫入審計日誌')">⬇️ 匯出策略卡 PDF</button></div>`;
+  spiceAudit("gen_strategy","策略卡 "+c.id,`${l.name} / ${c.sev} / ${c.topic} / region=${c.region} · 引用證據 ${c.ms.length} 條`);
+  $("#drawer").classList.add("open");$("#mask").classList.add("on");
+}
+function spiceDraft(cid){
+  const c=SPICE_CASES.find(x=>x.id===cid);if(!c)return;
+  const lvl=spiceLvl(c),fu=spiceFu(c);
+  draftContext={cid:c.id,lvl,tone:c.strategy.tone,avoid:c.strategy.no,store:c.store,topic:c.topic,
+    heard:c.demand,plats:Object.keys(c.plats).filter(k=>c.plats[k]>0),evId:c.evId,
+    fu:`${fu.first}首次回覆 · ${fu.due}完成跟進（SLA ${fu.txt}）`};
+  let idx=DRAFTS.findIndex(d=>d.mid===c.ms[0].mid);
+  if(idx<0){
+    const mrec=M.find(x=>x.id===c.ms[0].mid)||{};
+    const st=c.store,tp=c.topic;
+    const i18n={
+      "zh-Hant":{short:`感謝您就${st}「${tp}」的反映，我們已記錄並轉交相關團隊跟進。`,
+        formal:`您好，感謝您就${st}「${tp}」的反映。我們已記錄您提到的情況並轉交相關團隊跟進，會依程序覆核後回覆。如方便，請透過 cs@tamjai.demo 與我們聯絡，以便進一步了解。`},
+      "zh-Hans":{short:`感谢您就${st}「${tp}」的反映，我们已记录并转交相关团队跟进。`,
+        formal:`您好，感谢您就${st}「${tp}」的反映。我们已记录您提到的情况并转交相关团队跟进，会依程序复查后回复。如方便，请通过 cs@tamjai.demo 与我们联系，以便进一步了解。`},
+      "en":{short:`Thank you for your feedback about ${tp} at our ${st} store. We have logged it and forwarded it to the relevant team.`,
+        formal:`Thank you for your feedback about ${tp} at our ${st} store. We have recorded what you described and forwarded it to the relevant team for review, and will reply once the review is complete. If convenient, please contact us at cs@tamjai.demo so we can understand more.`},
+      "yue":{short:`多謝你就${st}「${tp}」嘅反映，我哋已經記錄咗，亦轉交咗相關團隊跟進。`,
+        formal:`你好，多謝你就${st}「${tp}」嘅反映。我哋已經記錄你提到嘅情況，並轉交相關團隊跟進，會依程序覆核後回覆。如方便，請透過 cs@tamjai.demo 同我哋聯絡，以便再了解多啲。`}};
+    DRAFTS.unshift({mid:c.ms[0].mid,sev:c.sev,tone:"sincere",toneName:"真誠道歉（依策略卡）",toneIc:"🙏",status:"pending",
+      evidence:mrec.text?1:0,refs:[c.evId,"原文 #"+c.ms[0].mid+" · "+c.ms[0].plat],
+      note:"由策略卡生成 · 語氣、不可說清單與證據卡已帶入 · 仍需人類批准",i18n});
+    idx=0;
+  }
+  draftLang="zh-Hant";
+  draftStyleMap[idx]=DRAFTS[idx].sev==="S3"?"short":"formal";
+  delete draftAckMap[idx];
+  draftSel={d:idx,tone:0};
+  spiceAudit("gen_draft","個案 "+c.id+" → Reply Workbench","帶入語氣／不可說清單／證據卡 "+c.evId);
+  toast("已帶入策略語氣與不可說清單 → Reply Workbench（需人工批准）");
+  go('drafts');
+}
+function spiceJump(cid){
+  const c=SPICE_CASES.find(x=>x.id===cid);if(!c)return;
+  hsState.brand="tamjai";hsState.region=c.region==="unknown"?"all":c.region;
+  hsState.row="store";hsState.col="topic";hsState.sel=[c.store,c.topic];
+  spiceAudit("view_hotspot","個案 "+c.id,"跳轉熱點地圖 · store="+c.store+" · topic="+c.topic+" · region="+c.region);
+  go('hotspots');toast("已跳轉熱點地圖："+c.store+" / "+c.topic);
+}
+function spiceDrill(cid){
+  const c=SPICE_CASES.find(x=>x.id===cid);if(!c)return;
+  spiceState.view="post";spiceState.brand="tamjai";spiceState.region=c.region;spiceState.topic=c.topic;
+  spiceState.plat="all";spiceState.openLow=true;
+  toast("已下鑽至單帖辣度："+c.store+" · "+c.topic);
+  render();
+}
+function spiceFromHotspot(region,topic,store){  spiceState.brand="tamjai";spiceState.view="topic";
+  spiceState.region=(region&&region!=="unknown")?region:"all";
+  if(HS_TOPICS.includes(topic))spiceState.topic=topic;
+  spiceState.openLow=true;
+  go('radar');
+  toast("辣度雷達已篩選："+(REGIONS[spiceState.region]?REGIONS[spiceState.region][0]:"全部大區")+" · "+spiceState.topic+(store?" · "+store:""));
+}
+function spiceOpenL4(){
+  const el=document.getElementById("spice-l4");
+  if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
+  else toast("目前篩選下沒有特辣個案");
+}
+function pgRadar(){
+  const list=spiceViewList();
+  const cnt={1:0,2:0,3:0,4:0};list.forEach(c=>cnt[spiceLvl(c)]++);
+  const pending=list.filter(c=>spiceLvl(c)===4&&!c.approved).length;
+  const mon=spiceMonitoring();
+  const monPosts=mon.reduce((a,c)=>{const cl=authCluster(c.cluster);return a+(cl?cl.mentions:c.sim)},0);
+  const excludedPosts=monPosts+(spiceState.realOnly?list.reduce((a,c)=>a+c.susp,0):0);
+  const byLvl={4:[],3:[],2:[],1:[]};list.forEach(c=>byLvl[spiceLvl(c)].push(c));
+  [4,3,2,1].forEach(k=>byLvl[k].sort((a,b)=>spiceScore(b)-spiceScore(a)));
+  const low=[...byLvl[2],...byLvl[1]];
+  const opt=(val,cur,label)=>`<option value="${val}"${cur===val?" selected":""}>${label}</option>`;
+  const bar=`<div class="card"><div class="hd" style="flex-wrap:wrap;gap:8px">
+      <b>🌶 辣度雷達</b>
+      <select onchange="spiceSet('brand',this.value)">${opt("tamjai",spiceState.brand,"品牌：譚仔")}${opt("samgor",spiceState.brand,"品牌：三哥")}</select>
+      <select onchange="spiceSet('region',this.value)">${opt("all",spiceState.region,"大區：全部")}${opt("hongkong",spiceState.region,"港島")}${opt("kowloon",spiceState.region,"九龍")}${opt("new_territories",spiceState.region,"新界")}</select>
+      <select onchange="spiceSet('plat',this.value)">${opt("all",spiceState.plat,"平台：全部")}${opt("OpenRice",spiceState.plat,"OpenRice")}${opt("Foodpanda",spiceState.plat,"Foodpanda")}${opt("Keeta",spiceState.plat,"Keeta")}</select>
+      <select onchange="spiceSet('topic',this.value)">${opt("all",spiceState.topic,"主題：全部")}${HS_TOPICS.map(t=>opt(t,spiceState.topic,t)).join("")}</select>
+      <select onchange="spiceSet('time',this.value);toast('原型：僅本週有種子資料，週次切換僅示範')">${opt("week",spiceState.time,"時間：本週")}${opt("last",spiceState.time,"上週")}${opt("m4",spiceState.time,"近 4 週")}</select>
+      <div class="spacer"></div>
+      <span class="seg"><button class="${!spiceState.realOnly?"on":""}" onclick="spiceRealOnly(false)">全部帖</button><button class="${spiceState.realOnly?"on":""}" onclick="spiceRealOnly(true)">只看真實帖</button></span>
+    </div></div>`;
+  if(spiceState.brand!=="tamjai")return bar+`<div class="card" style="margin-top:16px"><div class="bd empty" style="padding:64px">
+      🍂 <b>本週無顯著辣度個案</b><br><small>（三哥 samgor 種子未生成，切回「譚仔」查看演示數據）</small>
+      <div style="margin-top:14px"><button class="btn ghost sm" onclick="spiceSet('brand','tamjai')">← 返回譚仔</button></div></div></div>`;
+  const urgent=list.map(c=>({c,fu:spiceFu(c)})).filter(x=>x.fu.hrs<9999).sort((a,b)=>a.fu.hrs-b.fu.hrs)[0];
+  const summary=`<div class="card" style="margin-top:16px"><div class="bd" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:300px">
+        <div class="rowline" style="flex-wrap:wrap;gap:8px"><b style="font-size:13px">本週辣度分佈</b>
+          <small style="color:var(--muted)">主題辣度 · ${spiceState.realOnly?"已剔除可疑帖":"可疑帖僅標記"}</small></div>
+        <div class="spice-stat" style="margin-top:10px">
+          ${[4,3,2,1].map(l=>`<div class="item">${spiceBadge(l)}<b>${cnt[l]}</b></div>`).join("")}</div>
+        <div class="rowline" style="margin-top:12px;flex-wrap:wrap;gap:8px">
+          <span class="chip ${pending?"red":"green"}">待批准特辣 ${pending} 條</span>
+          ${urgent?`<span class="chip red" title="依辣度建議的首次回覆時限">⏱ 最緊急 ${urgent.c.store}／${urgent.c.topic} ${urgent.fu.txt}</span>`:""}
+          ${mon.length?`<span class="chip red" title="⛔ 可能不真實：不計入辣度，只監測">⛔ ${mon.length} 個個案不計入辣度</span>
+            <button class="btn ghost sm" onclick="authOpen('${mon[0].cluster}')">查看監測 →</button>`:""}
+          ${spiceState.realOnly?`<span class="chip amber">已排除可疑帖 ${excludedPosts} 條並重算</span>`:""}
+          <button class="btn ghost sm" onclick="spiceOpenL4()">查看 →</button>
+          <button class="btn ghost sm" onclick="spiceState.showCalc=!spiceState.showCalc;render()">🧮 辣度點計？${spiceState.showCalc?"▲":"▼"}</button>
+          <div class="spacer"></div><small style="color:var(--muted)">辣度 = 嚴重度 × 主題緊迫性 × 證據強度（⛔ 不計入）</small></div>
+        <div style="margin-top:10px;font-size:11.5px;color:var(--muted)">Listening：OpenRice / Foodpanda / Keeta 公開內容 → Strategy：基於證據的溝通策略 → Replying：草稿需人類批准</div>
+      </div>
+      <div style="text-align:center">${spiceRadarMini()}<div class="radar-legend" style="margin-top:0"><span><i style="background:#C8102E"></i>本週</span><span><i style="background:#B7B2A8"></i>上週</span></div></div>
+    </div></div>
+    ${spiceState.showCalc?`<div class="card" style="margin-top:16px;border-color:#E5DCC8"><div class="hd">🧮 辣度點計？<small>嚴重度 × 主題緊迫性 × 證據強度 → 決定辣度級別與建議跟進時間</small></div>
+      <div class="bd" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:12.5px">
+        <div><b>① 嚴重度（帖文後果，乘數 2–4）</b>
+          <div style="margin-top:8px" class="sig"><span class="ic r">4</span><div><b>S1 食安／歧視／法律威脅</b><small>任何 S1 直接判特辣，不可降級</small></div></div>
+          <div class="sig"><span class="ic y">3</span><div><b>S2 服務·價格·包裝等重複爭議</b><small>需跨平台重複才成立</small></div></div>
+          <div class="sig"><span class="ic g">2</span><div><b>S3 口味偏好·單次吐槽</b><small>不影響食安與信任</small></div></div></div>
+        <div><b>② 主題緊迫性（顧客在意程度，0.9–1.5）</b>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
+            ${Object.entries(TOPIC_URG).sort((a,b)=>b[1]-a[1]).map(t=>`<div class="rowline" style="gap:8px"><span style="width:64px">${t[0]}</span><div class="bar" style="flex:1;height:7px;border-radius:6px;background:#F0EDE6;overflow:hidden"><i style="display:block;height:100%;width:${(t[1]-0.85)/0.7*100}%;background:#E8552F"></i></div><b style="font-size:11.5px">×${t[1]}</b></div>`).join("")}
+          </div></div>
+        <div><b>③ 證據強度（可信度與規模，0.9 起）</b>
+          <div style="margin-top:8px;line-height:1.9">0.9 ＋ 相似帖 min(帖數,6)×0.32 ＋ （平台數−1）×0.45<br>
+            例：相似帖 3、2 平台 → 0.9＋0.96＋0.45 ＝ <b>2.31</b><br>
+            <span style="color:var(--muted)">可疑帖不計入相似帖；likely_inauthentic 整個個案不生成辣度</span></div>
+          <div style="margin-top:8px;font-size:11.5px;color:var(--muted)">級別：S1 或 ≥12 特辣｜≥9 大辣｜≥6 中辣｜&lt;6 小辣</div></div>
+        <div style="grid-column:1/-1;background:#FAF8F4;border-radius:10px;padding:10px 13px">
+          <b>示例 SP-01：</b>嚴重度 4（S1）× 主題緊迫性 1.5（衛生）× 證據強度 2.31（相似帖 3 · 2 平台）＝ <b style="color:var(--red)">13.9 → 特辣</b>　→　建議跟進：<b>2 小時內首次回覆、24 小時內完成跟進</b>（SLA 剩 14h）</div>
+      </div></div>`:""}`;
+  const body=`
+    ${byLvl[4].length?`<div id="spice-l4"><div class="sx-sec">特辣 · 食安／歧視／法律威脅（S1）<span class="chip red" style="margin-left:6px">${byLvl[4].length}</span></div>
+      ${byLvl[4].map(spiceCard).join("")}</div>`:""}
+    ${byLvl[3].length?`<div class="sx-sec">大辣 · 跨平台重複爭議（S2）<span class="chip amber" style="margin-left:6px">${byLvl[3].length}</span></div>
+      ${byLvl[3].map(spiceCard).join("")}`:""}
+    ${low.length?`<div class="sx-sec" style="display:flex;align-items:center;gap:8px">中辣 / 小辣<span class="chip gray">${low.length}</span>
+        <div class="spacer"></div><button class="btn ghost sm" onclick="spiceState.openLow=!spiceState.openLow;render()">${spiceState.openLow?"收起 ▲":"展開 ▼"}</button></div>
+      ${(spiceState.openLow||spiceState.view==="post")?low.map(spiceCard).join(""):'<div class="empty" style="padding:16px;border:1px dashed var(--line);border-radius:10px">已收起（原型預設收起，避免稀釋特辣注意力）</div>'}`:""}
+    ${mon.length?`<div class="sx-sec" style="display:flex;align-items:center;gap:8px;color:var(--red)">⛔ 監測中 · 可能不真實（不計入辣度）<span class="chip red">${mon.length}</span>
+        <div class="spacer"></div><button class="btn ghost sm" onclick="authOpen('${mon[0].cluster}')">查看真假分析 →</button></div>
+      <div style="border:1px dashed #E7C9CE;border-radius:10px;padding:11px 13px;background:#FDF7F8;font-size:12.5px;margin-bottom:12px">
+        ${mon.map(c=>`<div class="rowline" style="flex-wrap:wrap;gap:8px">
+          <span class="chip red">⛔ ${AUTH_VD[authStateOfCluster(authCluster(c.cluster))].name}</span>
+          <b>${c.store} · ${c.topic}</b><span class="chip">S2</span>
+          <span style="color:var(--muted)">${authCluster(c.cluster).mentions} 條相似帖 · ${authExplain(authCluster(c.cluster),authStates(authCluster(c.cluster)))}</span></div>`).join("")}
+        <div style="color:var(--muted);font-size:11.5px;margin-top:6px">依守則：不計入辣度／熱點／趨勢，只保留監測；如要回覆需先「保留但標記」並記錄覆核。</div></div>`:""}
+    ${!list.length?'<div class="empty" style="padding:48px"><div style="font-size:26px">🍂</div><b>本週無顯著辣度個案</b><br><small>調整大區／平台／主題篩選，或切回「全部帖」</small></div>':""}`;
+  return bar+summary+`<div class="card" style="margin-top:16px"><div class="hd" style="flex-wrap:wrap;gap:10px">
+      <span class="seg"><button class="${spiceState.view==="topic"?"on":""}" onclick="spiceSet('view','topic')">主題辣度（預設）</button><button class="${spiceState.view==="post"?"on":""}" onclick="spiceSet('view','post')">單帖辣度</button></span>
+      <small>${spiceState.view==="topic"?"按主題聚合：提及數 × 嚴重度加權 × 平台多樣性 × 真假過濾":"逐條 mention · 可從主題辣度下鑽"}</small>
+      <div class="spacer"></div><small style="color:var(--muted)">${list.length} 個個案</small></div>
+    <div class="bd">${body}</div></div>`;
+}
+function pgBrief(){
+  return `<div class="grid" style="grid-template-columns:1.5fr 1fr">
+  <div class="card"><div class="hd">📰 譚仔回響 · 每週決策簡報 <small>2026 W43（10-22 → 10-28）· 預覽</small></div><div class="bd" style="font-size:13.5px">
+    <p style="margin-bottom:10px"><b>一、本週態勢</b><br>全平台共 69 條意見入庫（OpenRice 36 / Foodpanda 17 / Keeta 16）。負面佔比 41%，按週 +18%。熱點集中於銅鑼灣店「衛生食安」（P0 ×2）與外賣出餐速度。</p>
+    <p style="margin-bottom:10px"><b>二、P0 事件追蹤</b><br>① 銅鑼灣店異物個案（#1201）：送檢中，草稿已批准待導出；② 湯底穩定性反饋（#1206）：供應商批次抽檢啟動。</p>
+    <p style="margin-bottom:10px"><b>三、真假信號（五信號 · 三狀態）</b><br>
+      本週 4 個相似群集：✅ 真實 2 個（C-85、C-88，共 15 條）、⚠ 可疑 1 個（C-79，8 條，帳號少 + 時間集中）、⛔ 可能不真實 1 個（C-77，12 條，帳號 2 個 + 集中 2 小時 + 文本 90% 相同）。<br>
+      平台分佈：OpenRice 25 條 / Foodpanda 6 條 / Keeta 4 條。已排除 ${AUTH_CLUSTERS.filter(c=>c.excluded).reduce((a,c)=>a+c.mentions,0)} 條（保留原文，不刪帖）；保留但標記 ${AUTH_CLUSTERS.filter(c=>c.keepFlagged).length} 個。<br>
+      <b>對辣度的影響：</b>排除 ⛔ 群集後，大辣由 3 條降至 2 條（灣仔店價格個案不計入）；需人工覆核清單：C-79（旺角／沙田排隊）。
+      <span style="color:var(--muted)">（每項判斷均可回看五信號與一句話解釋）</span></p>
+    <p><b>四、辣度分佈變化</b><br>特辣 2 條（上週 1，<b style="color:var(--red)">↑1</b>）· 大辣 3 · 中辣 3 · 小辣 2。特辣集中於九龍旺角店（衛生）與港島銅鑼灣店（衛生）；大辣集中於排隊（旺角／沙田）與價格（灣仔，含可疑帖 2 條，已標記不計入辣度）。平台分佈：OpenRice 11 / Foodpanda 4 / Keeta 4。</p>
+    <p><b>五、決策建議</b><br>1）銅鑼灣店週末高峰加派 1 名樓面；2）外賣包裝湯品加密封膜（試點旺角/觀塘）；3）辣度標示卡改版（中辣基準統一）。</p>
+    <p><b>六、語言／風格使用統計</b><br>
+      本週批准回覆 38 條：書面語 19（正式 15／簡短 4）· 廣東話口語 11（正式 6／簡短 5）· 英文 5 · 簡體 3。<br>
+      <b>被批准最多：</b>書面語 · 正式（15 條）；<b>被人工修改最多：</b>廣東話口語 · 簡短（7 條，主要補回跟進時限）；重新生成 9 次，其中 4 次因 Guardrail 命中補償字眼。<br>
+      <span style="color:var(--muted)">語言／風格切換共 132 次，全部寫入審計（switch_language / switch_style），可回溯每次切換前後的語言、風格與 Guardrail 狀態。</span></p>
+    <div style="border:1px dashed var(--line);border-radius:10px;padding:10px 13px;font-size:12px;color:var(--muted)">ℹ️ 簡報由聚合管線自動彙編（AI 標記：ai_generated:true），所有導出動作均記入審計日誌。</div>
+  </div></div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+    <div class="card"><div class="hd">語言 / 風格分佈 <small>本週已批准回覆</small></div><div class="bd">
+      ${[["書面語 · 正式",15,"#C8102E"],["書面語 · 簡短",4,"#E8552F"],["廣東話口語 · 正式",6,"#2B6CB0"],["廣東話口語 · 簡短",5,"#4A90D9"],["英文 · 正式/簡短",5,"#6B7A8F"],["簡體 · 正式/簡短",3,"#9AA5B1"]]
+      .map(r=>`<div class="wtopic"><span style="width:112px;font-size:12px;font-weight:600">${r[0]}</span><div class="bar"><i style="width:${r[1]*6.2}%;background:${r[2]}"></i></div><span class="chip">${r[1]}</span></div>`).join("")}
+      <div style="font-size:11.5px;color:var(--muted);margin-top:8px">批准最多的語言／風格會用於下週預設建議（S1/S2 仍一律建議「正式」）。</div>
+    </div></div>
+    <div class="card"><div class="hd">導出（需人類批准）</div><div class="bd" style="display:flex;flex-direction:column;gap:9px">
+      <button class="btn primary" onclick="toast('原型：簡報 PDF 已生成（含 CJK 字型，本地模擬）')">📄 導出 PDF 簡報</button>
+      <button class="btn ghost" onclick="toast('原型：CSV 已導出（本地模擬）')">📊 導出 CSV 明細</button>
+      <button class="btn ghost" onclick="toast('原型：已寫入人工發布隊列——系統永不自動發布')">📤 寫入人工發布隊列</button>
+      <div style="font-size:11.5px;color:var(--muted)">批准門狀態：<span class="chip green">brand_manager 已批准</span></div>
+    </div></div>
+    <div class="card"><div class="hd">合規包</div><div class="bd" style="display:flex;flex-direction:column;gap:9px">
+      <button class="btn ghost sm" onclick="toast('原型：8 章節合規包 PDF（本地模擬）')">🧾 個案合規包（#1201）</button>
+      <button class="btn ghost sm" onclick="toast('原型：週度合規包 PDF（本地模擬）')">🗂️ 週度合規包</button>
+    </div></div></div></div>`;
+}
+function pgUpload(){
+  return `<div class="grid" style="grid-template-columns:1.3fr 1fr">
+  <div class="card"><div class="hd">⬆️ 人工上傳顧客意見</div><div class="bd">
+    <div class="seg" style="margin-bottom:14px"><button class="on" onclick="fseg(this)">JSON</button><button onclick="fseg(this)">CSV</button><button onclick="fseg(this)">貼上文本</button></div>
+    <textarea rows="9" style="width:100%" placeholder='[{"platform":"openrice","text":"……","store":"銅鑼灣店","rating":2}]'>[
+  {"platform":"openrice", "text":"（示例）週末等位 40 分鐘，建議加位", "store":"旺角店", "rating":3, "lang":"zh-Hant"}
+]</textarea>
+    <div class="rowline" style="margin-top:12px;flex-wrap:wrap;gap:8px">
+      <select><option>自動偵測語言</option><option>繁中</option><option>簡中</option><option>粵語口語</option><option>英文</option></select>
+      <span class="chip gray">立即去識別化</span><span class="chip gray">保留期 180 天</span>
+      <div class="spacer"></div>
+      <button class="btn primary" onclick="toast('原型：已入庫 1 條 · 語言=繁中 · 情緒=中性 · 已寫審計')">上傳並入庫</button></div>
+    <div style="margin-top:12px;font-size:12px;color:var(--muted)">↑ 試試點「上傳並入庫」——原型會本地模擬管線：語言 → 實體 → 主題 → 情緒/嚴重度 → 去重 → 優先級。</div>
+  </div></div>
+  <div class="card"><div class="hd">最近上傳</div><div class="bd" style="font-size:13px">
+    ${[["#1207","旺角店 · 等位 40 分鐘","P2 出餐速度","已入庫"],["#1206","銅鑼灣店 · 湯底異味","P1 衛生食安","已入庫"],
+       ["#1205","觀塘店 · 辣度唔穩定","P2 辣度標示","已入庫"],["#1198","荃灣店 · 附件圖片","—","待人工覆核"]]
+    .map(u=>`<div class="sig"><span class="ic g">✓</span><div><b>${u[1]}</b><small>${u[2]} · ${u[3]}</small></div></div>`).join("")}
+    <div style="font-size:11.5px;color:var(--muted);margin-top:8px">無真實平台 API 也能跑完整 Demo —— 全部為人工上傳/模擬種子。</div>
+  </div></div></div>`;
+}
+function pgAudit(){
+  return `<div class="grid" style="grid-template-columns:1.5fr 1fr">
+  <div class="card"><div class="hd">🧾 審計日誌 <small>append-only · 無 UPDATE/DELETE API</small>
+   <div class="spacer"></div><span class="chip gray">hash_chain: off</span></div>
+  <table><thead><tr><th>時間</th><th>角色</th><th>動作</th><th>對象</th><th>風險標記</th><th>摘要</th></tr></thead>
+  <tbody>${AUDIT.map(a=>`<tr><td><small>${a.t}</small></td><td><b>${a.actor}</b></td><td><span class="chip">${a.act}</span></td>
+    <td>${a.obj}</td><td><span class="risk ${a.risk[0]}">${a.risk[1]}</span></td><td><small style="color:var(--muted)">${a.detail}</small></td></tr>`).join("")}</tbody></table>
+  <div class="bd" style="display:flex;gap:8px;border-top:1px solid var(--line)">
+    <button class="btn ghost sm" onclick="toast('原型：審計 CSV 已導出（帶篩選）')">⬇️ 導出 CSV</button>
+    <button class="btn ghost sm" onclick="toast('原型：抽查任務已建立（legal 角色）')">🎲 發起抽查</button>
+    ${ROLE==="admin"||ROLE==="brand_manager"?'<button class="btn ghost sm" onclick="toast(\'原型：歸檔完成，舊日誌轉 CSV 冷存\')">📦 歸檔（admin）</button>':""}
+  </div></div>
+  <div class="card"><div class="hd">單案故事線 · 個案 #1201</div><div class="bd"><div class="tl">
+    ${[["10-27 22:14","來源入庫","OpenRice 1★ · 粵語 · 作者雜湊",0],
+       ["10-27 22:14","AI 管線","情緒=負面 · P0 食安 · 群集 #C-85（自然）",0],
+       ["10-27 22:15","證據卡","原文 + 3 條關聯討論 · 連結存檔",0],
+       ["10-27 22:16","草稿 ×2","真誠道歉／專業回應 · Guardrail：S1×2、S2×2",0],
+       ["10-28 02:58","人工編輯","移除補償承諾 27 字 · 記錄理由",1],
+       ["10-28 03:12","批准","brand_manager → approved · 可導出",0],
+       ["10-28 03:12","風險提示","AL-03：同人同稿 ≥5 次修改（僅標示）",1]]
+    .map(e=>`<div class="ev ${e[3]?"mut":""}"><div class="t">${e[0]}</div><b style="font-size:13px">${e[1]}</b><br><small style="color:var(--muted)">${e[2]}</small></div>`).join("")}
+  </div>
+  <button class="btn ghost sm" onclick="toast('原型：故事線 PDF 已生成')">⬇️ 故事線 PDF</button></div></div></div>`;
+}
+function pgSettings(){
+  const src=(ic,bg,name,on,lock,note)=>`<div class="src"><div class="ic" style="background:${bg}">${ic}</div>
+    <div><b>${name}</b><br><small style="color:var(--muted)">${note}</small></div>
+    <div class="spacer"></div><div class="switch ${on?"on":""} ${lock?"off-locked":""}" onclick="${lock?`toast('⛔ 超出平台白名單（PRD §2）：Threads / 小紅書 / 微博 / 公眾號 / LinkedIn / 新聞 / LIHKG 已移出，API 一律 422')`:`toast('原型：${name} 已${on?"停用":"啟用"}（本地狀態）')`}"></div></div>`;
+  return `<div class="grid" style="grid-template-columns:1fr 1fr">
+  <div class="card"><div class="hd">🔌 資料源白名單（v3.2 收窄）</div><div class="bd">
+    ${src("O","#E8552F","OpenRice",true,0,"主評論源 · 授權/人工上傳")}
+    ${src("K","#FFC72C","Keeta",true,0,"外賣訂單評價")}
+    ${src("F","#E4006B","Foodpanda",true,0,"外賣評價")}
+    ${src("T","#1D9BF0","Threads",false,1,"已移出 · 422 拒絕")}
+    ${src("小","#C8102E","小紅書",false,1,"已移出 · 422 拒絕")}
+    <div style="font-size:11.5px;color:var(--muted);margin-top:10px">🔒 白名單為硬性清單：任何白名單外平台在 API 層一律返回 422，UI 不可開啟。</div>
+  </div></div>
+  <div class="card"><div class="hd">演示模式 · EDIT_MODE</div><div class="bd">
+    <div class="seg" style="margin-bottom:14px"><button class="on" onclick="fseg(this)">A · 沙盒可編輯</button><button onclick="fseg(this)">B</button><button onclick="fseg(this)">C</button></div>
+    <div style="font-size:13px;display:flex;flex-direction:column;gap:9px">
+      <div class="sig"><span class="ic g">✓</span><div><b>匿名訪客</b><small>新增/修改示範資料，全部標記 sandbox:true</small></div></div>
+      <div class="sig"><span class="ic y">!</span><div><b>批准 / 導出 / 隊列 / 設定</b><small>仍需真實帳號 —— 人類審批硬性邊界不變</small></div></div>
+      <div class="sig"><span class="ic g">✓</span><div><b>UI 橫幅</b><small>頂部黃色橫幅明示「沙盒模式，非真實數據」</small></div></div></div>
+    <div style="margin-top:14px;font-size:12.5px;color:var(--muted)">其他參數：RETENTION_DAYS=180 · RATE_LIMIT=240/min · AUDIT_RETENTION=24 月 · LLM_PROVIDER=none（規則降級）</div>
+  </div></div></div>`;
+}
+const PAGES={dashboard:pgDashboard,inbox:pgInbox,drafts:pgDrafts,signals:pgSignals,hotspots:pgHotspots,radar:pgRadar,brief:pgBrief,upload:pgUpload,audit:pgAudit,settings:pgSettings};
+function render(){$("#pg-title").textContent=TITLES[PAGE][0];$("#pg-sub").textContent=TITLES[PAGE][1];$("#page").innerHTML=PAGES[PAGE]()}
+render();
+/* 生成草稿 loading 動畫示例（收件箱 → 抽屜按鈕） */
+</script>
+</body>
+</html>
