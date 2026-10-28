@@ -261,6 +261,31 @@ input:focus,select:focus,textarea:focus{border-color:var(--red)}
 .on-sel{border-color:var(--red)!important;color:var(--red);background:#FDF1F3}
 
 @media(max-width:900px){#side{display:none}#drawer{width:100vw;max-width:100vw}}
+/* ===== 收件箱 · 語言／主題／反覆出現 分類 ===== */
+.ib-n{display:inline-block;min-width:17px;padding:0 5px;margin-left:3px;border-radius:9px;background:#EFE7E2;color:var(--muted);font-size:10.5px;font-weight:700;line-height:16px}
+.seg button.on .ib-n{background:#FBE9EC;color:var(--red)}
+.ib-row{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:8px;cursor:pointer;border-bottom:1px dashed #EFE9E2}
+.ib-row:hover{background:#FBF7F2}
+.ib-row:last-child{border-bottom:none}
+.ib-id{font-weight:700;font-size:11.5px;color:var(--muted);min-width:42px}
+.ib-txt{flex:1;min-width:0;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ib-meta{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.ib-scroll{max-height:260px;overflow:auto;padding-right:2px}
+.ib-kpi{display:flex;gap:13px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:2px 0 8px}
+.ib-kpi b{color:var(--ink);font-weight:700}
+.ib-bar{height:7px;border-radius:6px;background:#F1EDE8;overflow:hidden;display:flex;margin:4px 0 9px}
+.ib-bar i{display:block;height:100%}
+.ib-share{font-size:11.5px;color:var(--muted)}
+.ib-track{display:block;flex:1;height:8px;border-radius:5px;background:#F1EDE8;overflow:hidden;min-width:80px}
+.ib-track i{display:block;height:100%}
+.ib-big{font-size:20px;font-weight:800;line-height:1}
+.ib-big small{font-size:11px;font-weight:500;color:var(--muted)}
+.ib-div{width:1px;height:14px;background:var(--line);display:inline-block}
+.mx{width:100%;border-collapse:collapse;font-size:12.5px}
+.mx th,.mx td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.mx th{font-size:11.5px;color:var(--muted);font-weight:700}
+.mx th:first-child,.mx td:first-child{text-align:left;font-weight:600}
+.mx td.z{color:#CFC7BC}
 </style>
 </head>
 <body data-page-node-id="oMlpL2yTDd5uRUYQqDzehi">
@@ -880,7 +905,7 @@ let PAGE="dashboard", ROLE="guest", draftSel={d:0,tone:0};
 let draftLang="zh-Hant", draftStyleMap={}, draftAckMap={}, draftEditMap={}, draftEditOpen=false;
 let regenMap={}, regenView={}, draftToneFilter="all";
 const TITLES={dashboard:["總覽 Dashboard","香港 · 三平台（OpenRice / Keeta / Foodpanda）"],
- inbox:["意見收件箱","證據卡必附連結 · 去識別化存儲"],
+ inbox:["意見收件箱","按語言 · 主題 · 反覆出現分類 · 證據卡必附連結"],
  drafts:["AI 草稿審批","四語言／語體 × 兩種語氣（真誠道歉 / 專業回應）· 可無限次重新生成 · 人類批准門"],
  signals:["真假分析 · 五信號","三個狀態 · 一句話解釋 · 操作必填原因並寫入審計"],
  hotspots:["門店/時段熱點地圖","港島 / 九龍 / 新界 · 主題 × 時段聚合 · 補救清單（原型不接 GIS）"],
@@ -959,23 +984,84 @@ function pgDashboard(){
     </div></div>
   </div>`;
 }
-let inboxState={plat:"all",sen:"all",auth:"all",q:""};
+/* ==================== 意見收件箱 · 語言 / 主題 / 反覆出現 三維分類 ==================== */
+let inboxState={plat:"all",sen:"all",auth:"all",lang:"all",topic:"all",view:"list",q:""};
 function inboxSet(k,v){inboxState[k]=v;render()}
+function inboxReset(){inboxState.plat="all";inboxState.sen="all";inboxState.auth="all";inboxState.lang="all";inboxState.topic="all";inboxState.q="";render()}
 function inboxList(){
   return M.filter(m=>{
     if(inboxState.plat!=="all"&&m.plat!==inboxState.plat)return false;
     if(inboxState.sen!=="all"&&m.sentiment!==inboxState.sen)return false;
+    if(inboxState.lang!=="all"&&m.lang!==inboxState.lang)return false;
+    if(inboxState.topic!=="all"&&m.topic!==inboxState.topic)return false;
     const st=authOfMention(m).st;
     if(inboxState.auth==="real"&&st!=="authentic")return false;
     if(inboxState.auth==="suspect"&&st!=="suspicious")return false;
     if(inboxState.auth==="excluded"&&st!=="inauthentic")return false;
     if(inboxState.q){
-      const hay=(m.text+" "+m.store+" "+m.topic+" "+m.item).toLowerCase();
+      const hay=(m.text+" "+m.store+" "+m.topic+" "+m.item+" "+m.lang).toLowerCase();
       if(!hay.includes(inboxState.q.toLowerCase()))return false;
     }
     return true;
   });
 }
+const LANG_META={
+  "粵語口語":{ic:"🗣️",name:"廣東話口語",cls:"amber",desc:"口語化，繁體字＋粵語用詞"},
+  "繁中":{ic:"🇭🇰",name:"繁體中文",cls:"red",desc:"書面語繁體"},
+  "簡中":{ic:"🇨🇳",name:"簡體中文",cls:"blue",desc:"簡體字，多為內地旅客／跨境客"},
+  "英文":{ic:"🔤",name:"英文",cls:"green",desc:"English reviews"}};
+const langMeta=l=>LANG_META[l]||{ic:"•",name:l,cls:"gray",desc:""};
+const SEV_RANK={P0:0,S1:0,P1:1,S2:1,P2:2,S3:2,P3:3};
+const sevRank=s=>(SEV_RANK[s]==null?9:SEV_RANK[s]);
+const langAll=()=>[...new Set(M.map(m=>m.lang))].sort((a,b)=>M.filter(m=>m.lang===b).length-M.filter(m=>m.lang===a).length);
+const topicAll=()=>[...new Set(M.map(m=>m.topic))].sort((a,b)=>(M.filter(m=>m.topic===b).length-M.filter(m=>m.topic===a).length)||String(a).localeCompare(String(b),"zh-Hant"));
+const topicCount=t=>M.filter(m=>m.topic===t).length;
+function topOf(arr,key,n){const mp={};arr.forEach(x=>{mp[x[key]]=(mp[x[key]]||0)+1});return Object.keys(mp).map(k=>[k,mp[k]]).sort((a,b)=>b[1]-a[1]).slice(0,n)}
+const TOPIC_ACTION={
+  "衛生食安":"即日門店巡檢＋出品／清潔 SOP 覆核；S1／P0 個案由品牌經理批准回覆",
+  "出餐速度":"核對晚市人手排班與外賣出餐時限，超過 45 分鐘即時通報",
+  "排隊":"取號系統顯示預計等候時間；高峰期加開樓面／吧檯",
+  "服務":"樓面人手檢視＋服務話術培訓，並把正面個案沉澱為範例",
+  "服務態度":"正向回饋轉門店嘉許；負向個案納入服務培訓案例",
+  "辣度標示":"統一辣度分級卡與出品標準，回覆時附辣度說明",
+  "份量":"覆核份量標準並加做秤重抽查",
+  "價格":"整理價格與套餐溝通話術，避免「加價減量」觀感",
+  "性價比":"檢視套餐結構與同區競品對比，避免只靠加價",
+  "外賣包裝":"與平台檢視封口與漏汁問題，改用防漏袋"};
+const topicAction=t=>TOPIC_ACTION[t]||"納入下週品質會議跟進";
+/* 反覆出現判定：同一主題在當前篩選下出現 ≥2 次；再分跨店／同店 */
+function repeatGroups(list){
+  const map={};
+  list.forEach(m=>{(map[m.topic]=map[m.topic]||[]).push(m)});
+  return Object.keys(map).map(t=>{
+    const arr=map[t].slice().sort((a,b)=>sevRank(a.severity)-sevRank(b.severity));
+    const stores=[...new Set(arr.map(m=>m.store))];
+    let kind;
+    if(arr.length>=3&&stores.length>=2)kind={name:"跨店反覆",cls:"red",ic:"🔁",note:"同一主題在多間門店重複出現，屬系統性問題"};
+    else if(arr.length>=2&&stores.length===1)kind={name:"同店重複",cls:"amber",ic:"🔂",note:"同一門店重複出現同類問題，屬門店執行問題"};
+    else if(arr.length>=2)kind={name:"多店零星",cls:"amber",ic:"🔁",note:"同一主題分散在不同門店，暫未成規模但要留意"};
+    else kind={name:"單次出現",cls:"gray",ic:"•",note:"目前只有 1 條，屬單一個案"};
+    return {t,arr,stores,langs:[...new Set(arr.map(m=>m.lang))],plats:[...new Set(arr.map(m=>m.plat))],
+      cluster:[...new Set(arr.filter(m=>m.cluster).map(m=>m.cluster))],kind,maxSev:arr[0].severity};
+  }).sort((a,b)=>b.arr.length-a.arr.length||sevRank(a.maxSev)-sevRank(b.maxSev));
+}
+function miniRow(m){
+  const ai=authOfMention(m);
+  return `<div class="ib-row" onclick="openCard(${m.id})">
+    <span class="chip ${sevChip(m.severity)}">${m.severity}</span>
+    <span class="ib-id">#${m.id}</span>
+    <span class="ib-txt" style="${ai.st==="inauthentic"?"text-decoration:line-through;color:var(--muted)":""}">${esc(m.text.slice(0,40))}…</span>
+    <span class="ib-meta">${m.store}</span>
+    <span class="chip ${platChip(m.plat)}">${m.plat}</span>
+    ${m.cluster?`<span class="chip gray">${m.cluster}</span>`:""}
+  </div>`;
+}
+function selTopic(t){
+  const arr=inboxList().filter(m=>m.topic===t);
+  arr.forEach(m=>selMentions.add(m.id));
+  render();toast("已選中「"+t+"」"+arr.length+" 條，可用下方批量操作");
+}
+
 function toggleSel(id,el){
   if(selMentions.has(id))selMentions.delete(id);else selMentions.add(id);
   render();
@@ -1039,32 +1125,174 @@ function bulkKeep(){
       selMentions.clear();render();toast("已保留並標記（已寫審計）");
     },{preset:"內容具體可查證，保留計入但需人工覆核"});
 }
-function pgInbox(){
-  const list=inboxList();
-  const segBtn=(k,v,t)=>`<button class="${inboxState[k]===v?"on":""}" onclick="inboxSet('${k}','${v}')">${t}</button>`;
-  return `<div class="card"><div class="hd" style="flex-wrap:wrap;gap:8px">
-    <span class="seg">${segBtn("plat","all","全部平台")}${segBtn("plat","OpenRice","OpenRice")}${segBtn("plat","Keeta","Keeta")}${segBtn("plat","Foodpanda","Foodpanda")}</span>
-    <span class="seg">${segBtn("sen","all","全部情緒")}${segBtn("sen","neg","負面")}${segBtn("sen","neu","中性")}${segBtn("sen","pos","正面")}</span>
-    <div class="spacer"></div>
-    <input type="text" id="inbox-q" value="${esc(inboxState.q)}" placeholder="搜尋門店 / 菜品 / 關鍵字…" style="width:200px"
-      onkeydown="if(event.key==='Enter'){inboxState.q=this.value.trim();render()}">
-    <button class="btn ghost sm" onclick="inboxState.q=document.getElementById('inbox-q').value.trim();render()">套用</button></div>
-  <div class="bd" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:9px 18px">
-    <b style="font-size:12.5px">真假篩選</b>
-    <span class="seg">${segBtn("auth","all","全部")}${segBtn("auth","real","只看真實")}${segBtn("auth","suspect","只看可疑")}${segBtn("auth","excluded","已排除")}</span>
-    <div class="spacer"></div>
-    <small style="color:var(--muted)">顯示 ${list.length} / ${M.length} 條 · 真假僅影響計入與覆核提示，不刪帖</small></div>
-  <table><thead><tr><th style="width:40px"></th><th>內容摘要</th><th>平台</th><th>門店</th><th>情緒</th><th>嚴重度</th><th>主題</th><th>真假</th><th>時間</th></tr></thead>
-  <tbody>${list.length?list.map(m=>{const ai=authOfMention(m);const dim=ai.st!=="authentic";return `<tr class="click" onclick="openCard(${m.id})" style="${dim?"opacity:.92":""}">
+/* ---------- 檢視 1：逐條清單 ---------- */
+function ibListView(list){
+  const cnt=t=>list.filter(x=>x.topic===t).length;
+  return `<div class="card"><table><thead><tr><th style="width:36px"></th><th>內容摘要</th><th>平台</th><th>語言</th><th>門店</th><th>情緒</th><th>嚴重度</th><th>主題（重複）</th><th>真假</th><th>時間</th></tr></thead>
+  <tbody>${list.length?list.map(m=>{const ai=authOfMention(m);const dim=ai.st!=="authentic";const rep=cnt(m.topic);
+    return `<tr class="click" onclick="openCard(${m.id})" style="${dim?"opacity:.92":""}">
     <td><input type="checkbox" ${selMentions.has(m.id)?"checked":""} onclick="event.stopPropagation();toggleSel(${m.id},this)"></td>
-    <td style="max-width:320px"><b>#${m.id}</b> <span style="${ai.st==="inauthentic"?"text-decoration:line-through;color:var(--muted)":""}">${m.text.slice(0,38)}…</span><br><small style="color:var(--muted)">${m.item} · ${m.lang}</small></td>
-    <td><span class="chip ${platChip(m.plat)}">${m.plat}</span></td><td>${m.store}</td>
+    <td style="max-width:300px"><b>#${m.id}</b> <span style="${ai.st==="inauthentic"?"text-decoration:line-through;color:var(--muted)":""}">${esc(m.text.slice(0,32))}…</span><br><small style="color:var(--muted)">${m.item}</small></td>
+    <td><span class="chip ${platChip(m.plat)}">${m.plat}</span></td>
+    <td><span class="chip ${langMeta(m.lang).cls}">${langMeta(m.lang).ic} ${langMeta(m.lang).name}</span></td>
+    <td>${m.store}</td>
     <td><span class="chip ${senChip(m.sentiment)}">${{neg:"負面",pos:"正面",neu:"中性"}[m.sentiment]}</span></td>
-    <td><span class="chip ${sevChip(m.severity)}">${m.severity}</span></td><td>${m.topic}</td>
+    <td><span class="chip ${sevChip(m.severity)}">${m.severity}</span></td>
+    <td>${m.topic}${rep>=2?`<span class="chip amber" style="margin-left:4px" title="同一主題共 ${rep} 條">🔁×${rep}</span>`:""}</td>
     <td>${ai.st==="authentic"?authInline(null):authInline(ai.cl)}${ai.cl&&ai.st==="inauthentic"&&ai.cl.excluded?'<br><small style="color:var(--muted)">已排除</small>':""}</td>
     <td><small style="color:var(--muted)">${m.time}</small></td></tr>`}).join("")
-    :`<tr><td colspan="9"><div class="empty">沒有符合篩選的意見 — 切回「全部」或調整真假／平台條件</div></td></tr>`}</tbody></table></div>
-  <div style="margin-top:14px" class="rowline" style="flex-wrap:wrap;gap:8px">
+    :`<tr><td colspan="10"><div class="empty">沒有符合篩選的意見 — 切回「全部」或調整真假／平台／語言／主題條件</div></td></tr>`}</tbody></table></div>`;
+}
+/* ---------- 檢視 2：按語言 ---------- */
+function ibLangView(list){
+  const groups=langAll().map(lg=>({lg,arr:list.filter(m=>m.lang===lg)})).filter(g=>g.arr.length);
+  if(!groups.length)return `<div class="card"><div class="empty">沒有符合篩選的意見</div></div>`;
+  return `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(420px,1fr))">${groups.map(g=>{
+    const md=langMeta(g.lg);
+    const neg=g.arr.filter(m=>m.sentiment==="neg").length
+        , neu=g.arr.filter(m=>m.sentiment==="neu").length
+        , pos=g.arr.filter(m=>m.sentiment==="pos").length;
+    const share=Math.round(g.arr.length/list.length*100);
+    const tp=topOf(g.arr,"topic",3);
+    const repT=repeatGroups(g.arr).filter(r=>r.arr.length>=2);
+    const maxSev=g.arr.map(m=>m.severity).sort((a,b)=>sevRank(a)-sevRank(b))[0];
+    return `<div class="card"><div class="hd" style="gap:8px;flex-wrap:wrap">
+      <span class="chip ${md.cls}">${md.ic} ${md.name}</span>
+      <b style="font-size:13.5px">${g.arr.length} 條</b><span class="ib-share">佔 ${share}%</span>
+      <div class="spacer"></div>
+      ${repT.length?`<span class="chip amber" title="同一語言下出現 ≥2 次的主題">🔁 ${repT.length} 個主題反覆</span>`:`<span class="chip gray">無反覆</span>`}
+    </div>
+    <div class="bd" style="padding-top:12px">
+      <div class="ib-bar"><i style="width:${neg/g.arr.length*100}%;background:#D4553F"></i><i style="width:${neu/g.arr.length*100}%;background:#CFC7BC"></i><i style="width:${pos/g.arr.length*100}%;background:#5B9E6E"></i></div>
+      <div class="ib-kpi"><span>負面 <b>${neg}</b></span><span>中性 <b>${neu}</b></span><span>正面 <b>${pos}</b></span>
+        <span>最高嚴重度 <b>${maxSev}</b></span><span>涉及門店 <b>${new Set(g.arr.map(m=>m.store)).size}</b></span></div>
+      <div class="rowline" style="flex-wrap:wrap;gap:6px;margin:4px 0 8px"><small style="color:var(--muted)">主要主題</small>
+        ${tp.map(([t,n])=>`<span class="chip gray" style="cursor:pointer" onclick="inboxState.topic='${t}';inboxState.lang='${g.lg}';inboxState.view='list';render()">${t} ×${n}</span>`).join("")}</div>
+      <div class="ib-scroll">${g.arr.map(miniRow).join("")}</div>
+      <div style="margin-top:8px"><small style="color:var(--muted)">${md.desc} · 回覆語言建議：${md.name}</small></div>
+    </div></div>`}).join("")}</div>`;
+}
+/* ---------- 檢視 3：按主題（含語言 × 主題 交叉表） ---------- */
+function ibTopicView(list){
+  const topics=topicAll().filter(t=>list.some(m=>m.topic===t));
+  if(!topics.length)return `<div class="card"><div class="empty">沒有符合篩選的意見</div></div>`;
+  const langs=langAll();
+  const matrix=`<div class="card" style="margin-bottom:16px"><div class="hd">語言 × 主題 分佈
+      <span class="spacer"></span><small style="color:var(--muted)">格內數字＝意見條數 · 點格子可交叉篩選</small></div>
+    <div class="bd" style="overflow:auto;padding-top:10px"><table class="mx">
+      <thead><tr><th>主題 ＼ 語言</th>${langs.map(l=>`<th>${langMeta(l).ic} ${langMeta(l).name}</th>`).join("")}<th>合計</th><th>反覆</th></tr></thead>
+      <tbody>${topics.map(t=>{const row=langs.map(l=>list.filter(m=>m.topic===t&&m.lang===l).length);const tot=row.reduce((a,b)=>a+b,0);
+        const kind=repeatGroups(list).find(r=>r.t===t).kind;
+        return `<tr><td>${t}</td>${row.map((n,i)=>`<td class="${n?"":"z"}" style="${n?`cursor:pointer;background:rgba(212,85,63,${Math.min(0.07+n*0.1,0.36).toFixed(2)})`:""}" ${n?`onclick="inboxState.topic='${t}';inboxState.lang='${langs[i]}';inboxState.view='list';render()"`:""}>${n||"·"}</td>`).join("")}
+          <td><b>${tot}</b></td><td>${tot>=2?`<span class="chip ${kind.cls}">${kind.ic} ${kind.name}</span>`:'<span class="chip gray">—</span>'}</td></tr>`}).join("")}</tbody></table></div></div>`;
+  const cards=topics.map(t=>{
+    const arr=list.filter(m=>m.topic===t);
+    const stores=[...new Set(arr.map(m=>m.store))];
+    const langsIn=[...new Set(arr.map(m=>m.lang))];
+    const plats=[...new Set(arr.map(m=>m.plat))];
+    const rep=repeatGroups(list).find(r=>r.t===t);
+    const maxSev=arr.map(m=>m.severity).sort((a,b)=>sevRank(a)-sevRank(b))[0];
+    return `<div class="card">
+      <div class="hd" style="gap:8px;flex-wrap:wrap"><span class="chip ${rep.arr.length>=3?"red":rep.arr.length>=2?"amber":"gray"}">🏷️ ${t}</span>
+        <b style="font-size:13.5px">${arr.length} 條</b>
+        <span class="chip ${sevChip(maxSev)}">最高 ${maxSev}</span>
+        <div class="spacer"></div>
+        <span class="chip ${rep.kind.cls}" title="${rep.kind.note}">${rep.kind.ic} ${rep.kind.name}${rep.arr.length>=2?" ×"+rep.arr.length:""}</span></div>
+      <div class="bd" style="padding-top:10px">
+        <div class="ib-kpi"><span>門店 <b>${stores.length}</b></span><span>語言 <b>${langsIn.length}</b></span><span>平台 <b>${plats.length}</b></span>
+          <span>負面 <b>${arr.filter(m=>m.sentiment==="neg").length}</b></span>
+          ${rep.cluster.length?`<span>相似群集 <b>${rep.cluster.join(" / ")}</b></span>`:""}</div>
+        <div class="rowline" style="flex-wrap:wrap;gap:6px;margin-bottom:8px">
+          ${stores.map(s=>`<span class="chip gray">${s}</span>`).join("")}
+          ${langsIn.map(l=>`<span class="chip ${langMeta(l).cls}">${langMeta(l).ic} ${langMeta(l).name}</span>`).join("")}</div>
+        <div style="padding:8px 10px;background:#FAF7F3;border-radius:8px;font-size:12px;color:var(--ink);margin-bottom:8px">💡 建議跟進：${topicAction(t)}</div>
+        <div class="ib-scroll">${arr.map(miniRow).join("")}</div>
+      </div></div>`}).join("");
+  return matrix+`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(420px,1fr))">${cards}</div>`;
+}
+/* ---------- 檢視 4：反覆出現的同類問題 ---------- */
+function ibRepeatView(list,rep){
+  const hot=rep.filter(r=>r.arr.length>=2), once=rep.filter(r=>r.arr.length<2);
+  const posts=hot.reduce((a,r)=>a+r.arr.length,0);
+  if(!hot.length)return `<div class="card"><div class="empty">當前篩選下沒有反覆出現的主題 — 每類問題只出現 1 次</div></div>`;
+  const sum=`<div class="card"><div class="hd">🔁 反覆出現的同類問題<span class="spacer"></span>
+      <small style="color:var(--muted)">判定：同一主題出現 ≥2 次；跨店 3 次以上視為系統性</small></div>
+    <div class="bd" style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-end">
+      <div><small style="color:var(--muted)">反覆主題</small><div style="font-size:26px;font-weight:800;line-height:1.1">${hot.length}<small style="font-size:12px;font-weight:500;color:var(--muted)"> 個</small></div></div>
+      <div><small style="color:var(--muted)">涉及意見</small><div style="font-size:26px;font-weight:800;line-height:1.1">${posts}<small style="font-size:12px;font-weight:500;color:var(--muted)"> / ${list.length} 條</small></div></div>
+      <div><small style="color:var(--muted)">跨店反覆</small><div style="font-size:26px;font-weight:800;line-height:1.1">${hot.filter(r=>r.kind.name==="跨店反覆").length}</div></div>
+      <div><small style="color:var(--muted)">含 S1／P0</small><div style="font-size:26px;font-weight:800;line-height:1.1;color:var(--red)">${hot.filter(r=>sevRank(r.maxSev)===0).length}</div></div>
+      <div style="flex:1;min-width:220px">
+        ${hot.map(r=>`<div class="rowline" style="gap:8px;margin-bottom:4px"><small style="width:78px;color:var(--muted);text-align:right">${r.t}</small>
+          <span class="ib-track"><i style="width:${Math.round(r.arr.length/posts*100)}%;background:${r.kind.cls==="red"?"#D4553F":"#D9A24A"}"></i></span>
+          <b style="font-size:12px">${r.arr.length}</b></div>`).join("")}
+      </div></div></div>`;
+  const cards=hot.map(r=>`<div class="card" style="margin-top:14px;border-left:4px solid ${r.kind.cls==="red"?"#D4553F":"#D9A24A"}">
+    <div class="hd" style="gap:8px;flex-wrap:wrap">
+      <span class="chip ${r.kind.cls}">${r.kind.ic} ${r.kind.name}</span>
+      <b style="font-size:15px">${r.t}</b>
+      <span class="chip ${sevChip(r.maxSev)}">最高 ${r.maxSev}</span>
+      <div class="spacer"></div>
+      <span class="ib-big">${r.arr.length}<small> 次</small></span></div>
+    <div class="bd" style="padding-top:10px">
+      <div class="rowline" style="flex-wrap:wrap;gap:6px;margin-bottom:8px">
+        <small style="color:var(--muted)">涉及門店 ${r.stores.length}</small>${r.stores.map(s=>`<span class="chip gray">${s}</span>`).join("")}
+        <span class="ib-div"></span>
+        ${r.langs.map(l=>`<span class="chip ${langMeta(l).cls}">${langMeta(l).ic} ${langMeta(l).name}</span>`).join("")}
+        ${r.plats.map(p=>`<span class="chip ${platChip(p)}">${p}</span>`).join("")}
+        ${r.cluster.map(c=>`<span class="chip amber" title="相似帖群集">群集 ${c}</span>`).join("")}</div>
+      <div style="padding:9px 11px;background:#FAF7F3;border-radius:8px;font-size:12.5px;margin-bottom:8px">
+        ${r.kind.note}。<br><b>建議跟進：</b>${topicAction(r.t)}</div>
+      <div class="rowline" style="flex-wrap:wrap;gap:6px">
+        ${r.arr.map(m=>`<span class="chip ${sevChip(m.severity)} click" style="cursor:pointer" onclick="openCard(${m.id})">#${m.id} · ${m.store}</span>`).join("")}
+        <div class="spacer"></div>
+        <button class="btn ghost sm" onclick="selTopic('${r.t}')">☑ 選中這 ${r.arr.length} 條</button>
+      </div></div></div>`).join("");
+  const rest=once.length?`<div class="card" style="margin-top:14px"><div class="hd">單次出現 · ${once.length} 個主題<span class="spacer"></span><small style="color:var(--muted)">暫不構成反覆，持續觀察</small></div>
+    <div class="bd" style="display:flex;gap:6px;flex-wrap:wrap;padding-top:10px">${once.map(r=>`<span class="chip gray">${r.t} ×1</span>`).join("")}</div></div>`:"";
+  return sum+cards+rest;
+}
+function ibView(list,rep){
+  if(inboxState.view==="lang")return ibLangView(list);
+  if(inboxState.view==="topic")return ibTopicView(list);
+  if(inboxState.view==="repeat")return ibRepeatView(list,rep);
+  return ibListView(list);
+}
+function pgInbox(){
+  const list=inboxList();
+  const repAll=repeatGroups(list);
+  const repCount=repAll.filter(r=>r.arr.length>=2).length;
+  const seg=(k,v,t)=>`<button class="${inboxState[k]===v?"on":""}" onclick="inboxSet('${k}','${v}')">${t}</button>`;
+  const vtab=(v,t,n)=>`<button class="${inboxState.view===v?"on":""}" onclick="inboxSet('view','${v}')">${t}<span class="ib-n">${n}</span></button>`;
+  const langs=langAll(), topics=topicAll();
+  const filterOn=inboxState.plat!=="all"||inboxState.sen!=="all"||inboxState.auth!=="all"||inboxState.lang!=="all"||inboxState.topic!=="all"||!!inboxState.q;
+  const head=`<div class="card" style="margin-bottom:14px">
+    <div class="hd" style="flex-wrap:wrap;gap:8px">
+      <span class="seg">${vtab("list","📋 逐條清單",list.length)}${vtab("lang","🗣️ 按語言",new Set(list.map(m=>m.lang)).size)}${vtab("topic","🏷️ 按主題",new Set(list.map(m=>m.topic)).size)}${vtab("repeat","🔁 反覆出現",repCount)}</span>
+      <div class="spacer"></div>
+      <input type="text" id="inbox-q" value="${esc(inboxState.q)}" placeholder="搜尋門店 / 菜品 / 關鍵字…" style="width:190px"
+        onkeydown="if(event.key==='Enter'){inboxState.q=this.value.trim();render()}">
+      <button class="btn ghost sm" onclick="inboxState.q=document.getElementById('inbox-q').value.trim();render()">套用</button>
+    </div>
+    <div class="bd" style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:9px 18px">
+      <b style="font-size:12.5px">真假</b>
+      <span class="seg">${seg("auth","all","全部")}${seg("auth","real","真實")}${seg("auth","suspect","可疑")}${seg("auth","excluded","已排除")}</span>
+      <b style="font-size:12.5px;margin-left:6px">平台</b>
+      <span class="seg">${seg("plat","all","全部")}${seg("plat","OpenRice","OpenRice")}${seg("plat","Keeta","Keeta")}${seg("plat","Foodpanda","Foodpanda")}</span>
+    </div>
+    <div class="bd" style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:9px 18px">
+      <b style="font-size:12.5px">語言</b>
+      <span class="seg">${seg("lang","all","全部")}${langs.map(l=>seg("lang",l,langMeta(l).ic+" "+langMeta(l).name)).join("")}</span>
+      <b style="font-size:12.5px;margin-left:6px">主題</b>
+      <select onchange="inboxState.topic=this.value;render()" style="padding:6px 8px;border:1px solid var(--line);border-radius:8px;font-size:12.5px;background:#fff;max-width:200px">
+        <option value="all"${inboxState.topic==="all"?" selected":""}>全部主題（${M.length}）</option>
+        ${topics.map(t=>`<option value="${t}"${inboxState.topic===t?" selected":""}>${t}（${topicCount(t)}）</option>`).join("")}
+      </select>
+      <div class="spacer"></div>
+      <small style="color:var(--muted)">顯示 <b style="color:var(--ink)">${list.length}</b> / ${M.length} 條${filterOn?" · 已篩選":""}</small>
+      <button class="btn ghost sm" ${filterOn?"":"disabled"} onclick="inboxReset()">重設篩選</button>
+    </div></div>`;
+  const footer=`<div class="rowline" style="margin-top:14px;flex-wrap:wrap;gap:8px">
     <span class="chip ${selMentions.size?"red":"gray"}">已選 ${selMentions.size} 條</span>
     <button class="btn ghost sm" onclick="bulkExclude()">🚫 排除所選</button>
     <button class="btn ghost sm" onclick="bulkReview()">✍️ 標記誤判</button>
@@ -1072,7 +1300,9 @@ function pgInbox(){
     <button class="btn ghost sm" onclick="bulkKeep()">📌 保留但標記</button>
     <button class="btn ghost sm" onclick="go('upload')">＋ 人工上傳意見</button>
     <div class="spacer"></div><small style="color:var(--muted)">批量操作必填原因 · 寫入審計 →</small></div>`;
+  return head+ibView(list,repAll)+footer;
 }
+
 function fseg(b){[...b.parentNode.children].forEach(x=>x.classList.remove("on"));b.classList.add("on");toast("原型：篩選「"+b.textContent+"」已應用")}
 function openCard(id){
   const m=M.find(x=>x.id===id);if(!m)return;
